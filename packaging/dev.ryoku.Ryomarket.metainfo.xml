@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.ryoku.Ryomarket</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <name>Ryomarket</name>
+  <summary>One place to find and manage Linux applications</summary>
+  <description>
+    <p>Ryomarket presents native distro packages, Flatpaks, AppImages, Nix packages and curated upstream builds as one application catalogue.</p>
+    <p>Applications with multiple valid providers appear once and let the user choose the installation source.</p>
+  </description>
+  <launchable type="desktop-id">dev.ryoku.Ryomarket.desktop</launchable>
+  <developer id="dev.ryoku">
+    <name>Ryoku</name>
+  </developer>
+  <categories>
+    <category>System</category>
+    <category>PackageManager</category>
+  </categories>
+  <content_rating type="oars-1.1" />
+</component>

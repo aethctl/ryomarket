@@ -1,0 +1,21 @@
+/build/
+/dist/
+*.log
+.DS_Store
+
+# Build output
+/build/
+/result
+/result-*
+
+# Local development
+/.direnv/
+.env
+.env.*
+*.log
+*.tmp
+
+# Local backups
+*.before-*
+*.before-redesign
+*.bak

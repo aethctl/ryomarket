@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect width="256" height="256" fill="#0f0c07"/>
+  <rect x="18" y="18" width="220" height="220" fill="#1b150e" stroke="#e6dccb" stroke-opacity=".22" stroke-width="2"/>
+  <path d="M18 18h220v12H18z" fill="#e2342a"/>
+  <path d="M54 74h62v62H54zm86 0h62v62h-62zM54 160h62v42H54zm86 0h62v42h-62z" fill="none" stroke="#f3ede1" stroke-width="8"/>
+  <circle cx="128" cy="30" r="11" fill="#e2342a"/>
+  <text x="128" y="154" text-anchor="middle" fill="#e2342a" font-size="44" font-family="sans-serif" font-weight="700">力</text>
+</svg>

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Ryomarket
+Comment=Find and manage Linux applications across package sources
+Exec=ryomarket
+Icon=dev.ryoku.Ryomarket
+Terminal=false
+Categories=System;PackageManager;Utility;
+Keywords=apps;software;packages;flatpak;nix;dnf;pacman;xbps;
+StartupNotify=true

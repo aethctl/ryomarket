@@ -1,0 +1,2493 @@
+[
+  {
+    "id": "audacity",
+    "name": "Audacity",
+    "summary": "Record and edit audio with a straightforward waveform workflow.",
+    "description": "Audacity is a multitrack audio editor and recorder with effects, plugins, spectral tools and broad import and export support.",
+    "developer": "Audacity Team",
+    "homepage": "https://www.audacityteam.org/",
+    "categories": [
+      "Media",
+      "Creator"
+    ],
+    "keywords": [
+      "audio",
+      "record",
+      "waveform",
+      "podcast"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "dnf",
+          "package": "audacity",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.audacityteam.Audacity",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "audacity",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.audacityteam.Audacity",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "audacity",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.audacityteam.Audacity",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "xbps",
+          "package": "audacity",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.audacityteam.Audacity",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "audacity",
+          "recommended": true,
+          "official": true,
+          "verified": true
+        },
+        {
+          "kind": "nix-profile",
+          "package": "audacity",
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.audacityteam.Audacity",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "blender",
+    "name": "Blender",
+    "summary": "Model, animate, render and composite 3D content.",
+    "description": "Blender is a complete open source 3D creation suite covering modelling, sculpting, animation, simulation, rendering, compositing and video editing.",
+    "developer": "Blender Foundation",
+    "homepage": "https://www.blender.org/",
+    "categories": [
+      "Graphics",
+      "Creator"
+    ],
+    "keywords": [
+      "3d",
+      "render",
+      "animation",
+      "model"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "dnf",
+          "package": "blender",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.blender.Blender",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "blender",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.blender.Blender",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "blender",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.blender.Blender",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "xbps",
+          "package": "blender",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.blender.Blender",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "blender",
+          "recommended": true,
+          "official": true,
+          "verified": true
+        },
+        {
+          "kind": "nix-profile",
+          "package": "blender",
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.blender.Blender",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "com.usebottles.bottles",
+    "name": "Bottles",
+    "summary": "Run and manage Windows software",
+    "description": "Create isolated Wine environments for Windows applications and games with per-bottle runners and settings.",
+    "developer": "The Bottles Contributors",
+    "categories": [
+      "Gaming",
+      "Utilities"
+    ],
+    "keywords": [
+      "wine",
+      "windows",
+      "proton"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "com.usebottles.bottles",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "com.usebottles.bottles",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "com.usebottles.bottles",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "com.usebottles.bottles",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "com.usebottles.bottles",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "com.discordapp.Discord",
+    "name": "Discord",
+    "summary": "Voice, video and text chat for communities",
+    "description": "Chat with friends and communities using text, voice, video and screen sharing.",
+    "developer": "Discord Inc.",
+    "categories": [
+      "Social",
+      "Communication"
+    ],
+    "keywords": [
+      "chat",
+      "voice",
+      "gaming"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "com.discordapp.Discord",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "com.discordapp.Discord",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "com.discordapp.Discord",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "com.discordapp.Discord",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "com.discordapp.Discord",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "firefox",
+    "name": "Firefox",
+    "summary": "A fast, privacy-focused web browser.",
+    "description": "Mozilla Firefox is an open source web browser with tracking protection, extension support, profiles and strong standards compatibility.",
+    "developer": "Mozilla",
+    "homepage": "https://www.mozilla.org/firefox/",
+    "categories": [
+      "Internet"
+    ],
+    "keywords": [
+      "browser",
+      "web",
+      "mozilla"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "dnf",
+          "package": "firefox",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.mozilla.firefox",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "firefox",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.mozilla.firefox",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "firefox",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.mozilla.firefox",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "xbps",
+          "package": "firefox",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.mozilla.firefox",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "firefox",
+          "recommended": true,
+          "official": true,
+          "verified": true
+        },
+        {
+          "kind": "nix-profile",
+          "package": "firefox",
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.mozilla.firefox",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "com.github.tchx84.Flatseal",
+    "name": "Flatseal",
+    "summary": "Manage Flatpak permissions",
+    "description": "Review and change permissions granted to installed Flatpak applications.",
+    "developer": "Martin Abente Lahaye",
+    "categories": [
+      "Utilities",
+      "System"
+    ],
+    "keywords": [
+      "flatpak",
+      "permissions",
+      "sandbox"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "com.github.tchx84.Flatseal",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "com.github.tchx84.Flatseal",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "com.github.tchx84.Flatseal",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "com.github.tchx84.Flatseal",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "com.github.tchx84.Flatseal",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "gimp",
+    "name": "GIMP",
+    "summary": "Create and edit images with a mature open source toolkit.",
+    "description": "GIMP provides layers, masks, colour tools, filters, scripting and extensibility for photo editing, illustration and graphics work.",
+    "developer": "The GIMP Team",
+    "homepage": "https://www.gimp.org/",
+    "categories": [
+      "Graphics",
+      "Creator"
+    ],
+    "keywords": [
+      "image",
+      "photo",
+      "editor",
+      "graphics"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "dnf",
+          "package": "gimp",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.gimp.GIMP",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "gimp",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.gimp.GIMP",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "gimp",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.gimp.GIMP",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "xbps",
+          "package": "gimp",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.gimp.GIMP",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "gimp",
+          "recommended": true,
+          "official": true,
+          "verified": true
+        },
+        {
+          "kind": "nix-profile",
+          "package": "gimp",
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.gimp.GIMP",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "godot",
+    "name": "Godot Engine",
+    "summary": "Build 2D and 3D games with an open source game engine.",
+    "description": "Godot is a feature-rich game engine with an integrated editor, GDScript, C# support, scene-based workflows and exports to desktop, mobile and web.",
+    "developer": "Godot Engine",
+    "homepage": "https://godotengine.org/",
+    "categories": [
+      "Development",
+      "Creator"
+    ],
+    "keywords": [
+      "game",
+      "engine",
+      "development",
+      "editor"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "dnf",
+          "package": "godot",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.godotengine.Godot",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "godot",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.godotengine.Godot",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "godot",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.godotengine.Godot",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "xbps",
+          "package": "godot",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.godotengine.Godot",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "godot_4",
+          "recommended": true,
+          "official": true,
+          "verified": true
+        },
+        {
+          "kind": "nix-profile",
+          "package": "godot_4",
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.godotengine.Godot",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "com.heroicgameslauncher.hgl",
+    "name": "Heroic",
+    "summary": "Launcher for Epic, GOG and Amazon games",
+    "description": "Open source game launcher with library management, Wine and Proton integration and cloud save support.",
+    "developer": "Heroic Games Launcher",
+    "categories": [
+      "Gaming"
+    ],
+    "keywords": [
+      "epic",
+      "gog",
+      "amazon",
+      "wine"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "com.heroicgameslauncher.hgl",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "com.heroicgameslauncher.hgl",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "com.heroicgameslauncher.hgl",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "com.heroicgameslauncher.hgl",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "com.heroicgameslauncher.hgl",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "inkscape",
+    "name": "Inkscape",
+    "summary": "Design vector artwork, diagrams, logos and illustrations.",
+    "description": "Inkscape is an SVG-focused vector graphics editor with paths, typography, gradients, filters and precise layout tools.",
+    "developer": "Inkscape Project",
+    "homepage": "https://inkscape.org/",
+    "categories": [
+      "Graphics",
+      "Creator"
+    ],
+    "keywords": [
+      "vector",
+      "svg",
+      "design",
+      "illustration"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "dnf",
+          "package": "inkscape",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.inkscape.Inkscape",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "inkscape",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.inkscape.Inkscape",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "inkscape",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.inkscape.Inkscape",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "xbps",
+          "package": "inkscape",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.inkscape.Inkscape",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "inkscape",
+          "recommended": true,
+          "official": true,
+          "verified": true
+        },
+        {
+          "kind": "nix-profile",
+          "package": "inkscape",
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.inkscape.Inkscape",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "kdenlive",
+    "name": "Kdenlive",
+    "summary": "Edit video on a multitrack timeline with effects and proxies.",
+    "description": "Kdenlive is a non-linear video editor with multitrack editing, proxy workflows, effects, scopes, titling and broad format support through FFmpeg.",
+    "developer": "KDE",
+    "homepage": "https://kdenlive.org/",
+    "categories": [
+      "Media",
+      "Creator"
+    ],
+    "keywords": [
+      "video",
+      "editor",
+      "timeline",
+      "ffmpeg"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "dnf",
+          "package": "kdenlive",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.kde.kdenlive",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "kdenlive",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.kde.kdenlive",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "kdenlive",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.kde.kdenlive",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "xbps",
+          "package": "kdenlive",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.kde.kdenlive",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "kdenlive",
+          "recommended": true,
+          "official": true,
+          "verified": true
+        },
+        {
+          "kind": "nix-profile",
+          "package": "kdenlive",
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.kde.kdenlive",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "krita",
+    "name": "Krita",
+    "summary": "Paint and illustrate with a professional digital art studio.",
+    "description": "Krita is a painting application built for concept art, illustration, comics, textures and frame-by-frame animation.",
+    "developer": "Krita Foundation",
+    "homepage": "https://krita.org/",
+    "categories": [
+      "Graphics",
+      "Creator"
+    ],
+    "keywords": [
+      "paint",
+      "drawing",
+      "illustration",
+      "art"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "dnf",
+          "package": "krita",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.kde.krita",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "krita",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.kde.krita",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "krita",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.kde.krita",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "xbps",
+          "package": "krita",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.kde.krita",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "krita",
+          "recommended": true,
+          "official": true,
+          "verified": true
+        },
+        {
+          "kind": "nix-profile",
+          "package": "krita",
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.kde.krita",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "libreoffice",
+    "name": "LibreOffice",
+    "summary": "Documents, spreadsheets, presentations and more.",
+    "description": "LibreOffice is a complete open source office suite with Writer, Calc, Impress, Draw, Base and Math.",
+    "developer": "The Document Foundation",
+    "homepage": "https://www.libreoffice.org/",
+    "categories": [
+      "Office"
+    ],
+    "keywords": [
+      "writer",
+      "spreadsheet",
+      "presentation",
+      "documents"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "dnf",
+          "package": "libreoffice",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.libreoffice.LibreOffice",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "libreoffice-fresh",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.libreoffice.LibreOffice",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "libreoffice-fresh",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.libreoffice.LibreOffice",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "xbps",
+          "package": "libreoffice",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.libreoffice.LibreOffice",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "libreoffice-qt",
+          "recommended": true,
+          "official": true,
+          "verified": true
+        },
+        {
+          "kind": "nix-profile",
+          "package": "libreoffice-qt",
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.libreoffice.LibreOffice",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "io.github.mifi.losslesscut",
+    "name": "LosslessCut",
+    "summary": "Lossless video and audio trimming without re-encoding.",
+    "description": "A cross-platform media tool for extremely fast lossless operations on video and audio files.",
+    "developer": "Mikael Finstad",
+    "homepage": "https://github.com/mifi/lossless-cut",
+    "categories": [
+      "Video",
+      "Audio"
+    ],
+    "keywords": [
+      "trim",
+      "cut",
+      "ffmpeg",
+      "media"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "appimage",
+          "package": "io.github.mifi.losslesscut",
+          "label": "Official AppImage",
+          "release_repo": "mifi/lossless-cut",
+          "asset_pattern": "^LosslessCut-linux-x86_64\\.AppImage$",
+          "recommended": true,
+          "official": true,
+          "verified": true,
+          "notes": "Official upstream x86_64 AppImage managed by Ryomarket. · glibc hosts",
+          "architectures": [
+            "amd64"
+          ],
+          "libcs": [
+            "glibc"
+          ]
+        },
+        {
+          "kind": "flatpak",
+          "package": "no.mifi.losslesscut",
+          "label": "Flathub",
+          "sandboxed": true
+        }
+      ],
+      "arch": [
+        {
+          "kind": "appimage",
+          "package": "io.github.mifi.losslesscut",
+          "label": "Official AppImage",
+          "release_repo": "mifi/lossless-cut",
+          "asset_pattern": "^LosslessCut-linux-x86_64\\.AppImage$",
+          "recommended": true,
+          "official": true,
+          "verified": true,
+          "notes": "Official upstream x86_64 AppImage managed by Ryomarket. · glibc hosts",
+          "architectures": [
+            "amd64"
+          ],
+          "libcs": [
+            "glibc"
+          ]
+        },
+        {
+          "kind": "flatpak",
+          "package": "no.mifi.losslesscut",
+          "label": "Flathub",
+          "sandboxed": true
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "appimage",
+          "package": "io.github.mifi.losslesscut",
+          "label": "Official AppImage",
+          "release_repo": "mifi/lossless-cut",
+          "asset_pattern": "^LosslessCut-linux-x86_64\\.AppImage$",
+          "recommended": true,
+          "official": true,
+          "verified": true,
+          "notes": "Official upstream x86_64 AppImage managed by Ryomarket. · glibc hosts",
+          "architectures": [
+            "amd64"
+          ],
+          "libcs": [
+            "glibc"
+          ]
+        },
+        {
+          "kind": "flatpak",
+          "package": "no.mifi.losslesscut",
+          "label": "Flathub",
+          "sandboxed": true
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "no.mifi.losslesscut",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true
+        },
+        {
+          "kind": "appimage",
+          "package": "io.github.mifi.losslesscut",
+          "label": "Official AppImage",
+          "release_repo": "mifi/lossless-cut",
+          "asset_pattern": "^LosslessCut-linux-x86_64\\.AppImage$",
+          "official": true,
+          "verified": true,
+          "notes": "Official upstream x86_64 AppImage managed by Ryomarket. · glibc hosts",
+          "architectures": [
+            "amd64"
+          ],
+          "libcs": [
+            "glibc"
+          ]
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "no.mifi.losslesscut",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true
+        }
+      ]
+    }
+  },
+  {
+    "id": "net.lutris.Lutris",
+    "name": "Lutris",
+    "summary": "Open source game manager",
+    "description": "Organize and launch Linux and Windows games with community installers and Wine integrations.",
+    "developer": "Lutris",
+    "categories": [
+      "Gaming"
+    ],
+    "keywords": [
+      "games",
+      "wine",
+      "launcher"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "net.lutris.Lutris",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "net.lutris.Lutris",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "net.lutris.Lutris",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "net.lutris.Lutris",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "net.lutris.Lutris",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "io.missioncenter.MissionCenter",
+    "name": "Mission Center",
+    "summary": "Monitor system resource usage",
+    "description": "Monitor CPU, memory, disk, network, GPU and per-process resource usage in a modern desktop interface.",
+    "developer": "Mission Center Developers",
+    "categories": [
+      "System",
+      "Utilities"
+    ],
+    "keywords": [
+      "task manager",
+      "cpu",
+      "gpu",
+      "monitor"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "io.missioncenter.MissionCenter",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "io.missioncenter.MissionCenter",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "io.missioncenter.MissionCenter",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "io.missioncenter.MissionCenter",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "io.missioncenter.MissionCenter",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "obs-studio",
+    "name": "OBS Studio",
+    "summary": "Record and stream video with a powerful scene-based workflow.",
+    "description": "OBS Studio is a free and open source application for video recording and live streaming, with scenes, sources, filters, transitions and hardware encoding support.",
+    "developer": "OBS Project",
+    "homepage": "https://obsproject.com/",
+    "categories": [
+      "Media",
+      "Creator"
+    ],
+    "keywords": [
+      "stream",
+      "record",
+      "capture",
+      "twitch",
+      "youtube"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "dnf",
+          "package": "obs-studio",
+          "recommended": true,
+          "official": false,
+          "requires_root": true,
+          "label": "RPM repository",
+          "notes": "Native package from an enabled Fedora-compatible repository."
+        },
+        {
+          "kind": "flatpak",
+          "package": "com.obsproject.Studio",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "obs-studio",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "com.obsproject.Studio",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "obs-studio",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "com.obsproject.Studio",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "xbps",
+          "package": "obs",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "com.obsproject.Studio",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "obs-studio",
+          "recommended": true,
+          "official": true,
+          "verified": true,
+          "label": "System configuration"
+        },
+        {
+          "kind": "nix-profile",
+          "package": "obs-studio",
+          "official": true,
+          "label": "User profile"
+        },
+        {
+          "kind": "flatpak",
+          "package": "com.obsproject.Studio",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "md.obsidian.Obsidian",
+    "name": "Obsidian",
+    "summary": "Markdown knowledge base and notes",
+    "description": "Build a local knowledge base from Markdown files with links, graphs and community plugins.",
+    "developer": "Obsidian",
+    "categories": [
+      "Productivity"
+    ],
+    "keywords": [
+      "notes",
+      "markdown",
+      "knowledge"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "md.obsidian.Obsidian",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "md.obsidian.Obsidian",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "md.obsidian.Obsidian",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "md.obsidian.Obsidian",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "md.obsidian.Obsidian",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "org.prismlauncher.PrismLauncher",
+    "name": "Prism Launcher",
+    "summary": "Flexible Minecraft launcher",
+    "description": "Manage multiple Minecraft instances, accounts, mod loaders and modpacks from one launcher.",
+    "developer": "Prism Launcher",
+    "categories": [
+      "Gaming"
+    ],
+    "keywords": [
+      "minecraft",
+      "mods",
+      "launcher"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "org.prismlauncher.PrismLauncher",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "org.prismlauncher.PrismLauncher",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "org.prismlauncher.PrismLauncher",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "org.prismlauncher.PrismLauncher",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "org.prismlauncher.PrismLauncher",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "org.signal.Signal",
+    "name": "Signal Desktop",
+    "summary": "Private messaging from your desktop",
+    "description": "Desktop client for Signal messaging with encrypted chats, calls and attachments.",
+    "developer": "Signal",
+    "categories": [
+      "Social",
+      "Communication"
+    ],
+    "keywords": [
+      "chat",
+      "privacy",
+      "messaging"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "org.signal.Signal",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "org.signal.Signal",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "org.signal.Signal",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "org.signal.Signal",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "org.signal.Signal",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "com.spotify.Client",
+    "name": "Spotify",
+    "summary": "Stream music and podcasts",
+    "description": "Desktop client for browsing and streaming Spotify music, podcasts and playlists.",
+    "developer": "Spotify",
+    "categories": [
+      "Audio & Music"
+    ],
+    "keywords": [
+      "music",
+      "streaming",
+      "podcasts"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "com.spotify.Client",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "com.spotify.Client",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "com.spotify.Client",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "com.spotify.Client",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "com.spotify.Client",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "com.valvesoftware.Steam",
+    "name": "Steam",
+    "summary": "PC game library and storefront",
+    "description": "Browse, install and play games from your Steam library on Linux.",
+    "developer": "Valve Corporation",
+    "categories": [
+      "Gaming"
+    ],
+    "keywords": [
+      "games",
+      "proton",
+      "store"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "com.valvesoftware.Steam",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "com.valvesoftware.Steam",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "com.valvesoftware.Steam",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "com.valvesoftware.Steam",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "com.valvesoftware.Steam",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "org.telegram.desktop",
+    "name": "Telegram",
+    "summary": "Fast cloud messaging client",
+    "description": "Desktop client for Telegram chats, groups, channels, calls and file sharing.",
+    "developer": "Telegram",
+    "categories": [
+      "Social",
+      "Communication"
+    ],
+    "keywords": [
+      "chat",
+      "messaging",
+      "groups"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "org.telegram.desktop",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "org.telegram.desktop",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "org.telegram.desktop",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "org.telegram.desktop",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "org.telegram.desktop",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "thunderbird",
+    "name": "Thunderbird",
+    "summary": "Mail, calendars and contacts in one open source client.",
+    "description": "Thunderbird combines email, calendars, contacts, feeds and extensibility in a desktop client maintained by Mozilla's community.",
+    "developer": "Mozilla",
+    "homepage": "https://www.thunderbird.net/",
+    "categories": [
+      "Internet",
+      "Office"
+    ],
+    "keywords": [
+      "mail",
+      "email",
+      "calendar",
+      "contacts"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "dnf",
+          "package": "thunderbird",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.mozilla.Thunderbird",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "thunderbird",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.mozilla.Thunderbird",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "thunderbird",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.mozilla.Thunderbird",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "xbps",
+          "package": "thunderbird",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.mozilla.Thunderbird",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "thunderbird",
+          "recommended": true,
+          "official": true,
+          "verified": true
+        },
+        {
+          "kind": "nix-profile",
+          "package": "thunderbird",
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.mozilla.Thunderbird",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "vlc",
+    "name": "VLC",
+    "summary": "Play almost any video or audio format.",
+    "description": "VLC is a cross-platform media player with broad codec support, network playback, subtitles, hardware acceleration and streaming tools.",
+    "developer": "VideoLAN",
+    "homepage": "https://www.videolan.org/vlc/",
+    "categories": [
+      "Media"
+    ],
+    "keywords": [
+      "video",
+      "audio",
+      "player",
+      "media"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "dnf",
+          "package": "vlc",
+          "recommended": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.videolan.VLC",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "vlc",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.videolan.VLC",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "vlc",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.videolan.VLC",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "xbps",
+          "package": "vlc",
+          "recommended": true,
+          "official": true,
+          "requires_root": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.videolan.VLC",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "vlc",
+          "recommended": true,
+          "official": true,
+          "verified": true
+        },
+        {
+          "kind": "nix-profile",
+          "package": "vlc",
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "org.videolan.VLC",
+          "official": true,
+          "sandboxed": true,
+          "label": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "com.vscodium.codium",
+    "name": "VSCodium",
+    "summary": "Community build of the VS Code editor",
+    "description": "A freely licensed build of the VS Code code editor without Microsoft branding and telemetry defaults.",
+    "developer": "VSCodium",
+    "categories": [
+      "Development"
+    ],
+    "keywords": [
+      "editor",
+      "code",
+      "ide"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "com.vscodium.codium",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "com.vscodium.codium",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "com.vscodium.codium",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "com.vscodium.codium",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "com.vscodium.codium",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "io.github.flattool.Warehouse",
+    "name": "Warehouse",
+    "summary": "Manage installed Flatpaks",
+    "description": "Inspect Flatpak packages, manage remotes, rollbacks and leftover application data from a graphical interface.",
+    "developer": "Heliguy",
+    "categories": [
+      "Utilities",
+      "System"
+    ],
+    "keywords": [
+      "flatpak",
+      "packages",
+      "rollback"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "io.github.flattool.Warehouse",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "arch": [
+        {
+          "kind": "flatpak",
+          "package": "io.github.flattool.Warehouse",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "flatpak",
+          "package": "io.github.flattool.Warehouse",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "io.github.flattool.Warehouse",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "flatpak",
+          "package": "io.github.flattool.Warehouse",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true,
+          "notes": "Flathub"
+        }
+      ]
+    }
+  },
+  {
+    "id": "dev.zed.Zed",
+    "name": "Zed",
+    "summary": "A high-performance collaborative code editor.",
+    "description": "A fast, multiplayer code editor built for modern software development.",
+    "developer": "Zed Industries",
+    "homepage": "https://zed.dev",
+    "categories": [
+      "Development"
+    ],
+    "keywords": [
+      "editor",
+      "code",
+      "programming",
+      "collaboration"
+    ],
+    "variants": {
+      "fedora": [
+        {
+          "kind": "flatpak",
+          "package": "dev.zed.Zed",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true
+        },
+        {
+          "kind": "upstream",
+          "package": "dev.zed.Zed",
+          "label": "Official upstream archive",
+          "release_repo": "zed-industries/zed",
+          "asset_pattern": "^zed-linux-x86_64\\.tar\\.gz$",
+          "entrypoint": "zed.app/bin/zed",
+          "official": true,
+          "verified": true,
+          "notes": "Official x86_64 tar.gz release managed in your user data directory. · glibc hosts",
+          "architectures": [
+            "amd64"
+          ],
+          "libcs": [
+            "glibc"
+          ]
+        }
+      ],
+      "arch": [
+        {
+          "kind": "pacman",
+          "package": "zed",
+          "label": "Arch Extra",
+          "recommended": true,
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "dev.zed.Zed",
+          "label": "Flathub",
+          "sandboxed": true
+        },
+        {
+          "kind": "upstream",
+          "package": "dev.zed.Zed",
+          "label": "Official upstream archive",
+          "release_repo": "zed-industries/zed",
+          "asset_pattern": "^zed-linux-x86_64\\.tar\\.gz$",
+          "entrypoint": "zed.app/bin/zed",
+          "official": true,
+          "verified": true,
+          "architectures": [
+            "amd64"
+          ],
+          "libcs": [
+            "glibc"
+          ],
+          "notes": "glibc hosts"
+        }
+      ],
+      "cachyos": [
+        {
+          "kind": "pacman",
+          "package": "zed",
+          "label": "Arch/CachyOS repository",
+          "recommended": true,
+          "official": true
+        },
+        {
+          "kind": "flatpak",
+          "package": "dev.zed.Zed",
+          "label": "Flathub",
+          "sandboxed": true
+        },
+        {
+          "kind": "upstream",
+          "package": "dev.zed.Zed",
+          "label": "Official upstream archive",
+          "release_repo": "zed-industries/zed",
+          "asset_pattern": "^zed-linux-x86_64\\.tar\\.gz$",
+          "entrypoint": "zed.app/bin/zed",
+          "official": true,
+          "verified": true,
+          "architectures": [
+            "amd64"
+          ],
+          "libcs": [
+            "glibc"
+          ],
+          "notes": "glibc hosts"
+        }
+      ],
+      "void": [
+        {
+          "kind": "flatpak",
+          "package": "dev.zed.Zed",
+          "label": "Flathub",
+          "recommended": true,
+          "sandboxed": true
+        },
+        {
+          "kind": "upstream",
+          "package": "dev.zed.Zed",
+          "label": "Official upstream archive",
+          "release_repo": "zed-industries/zed",
+          "asset_pattern": "^zed-linux-x86_64\\.tar\\.gz$",
+          "entrypoint": "zed.app/bin/zed",
+          "official": true,
+          "verified": true,
+          "architectures": [
+            "amd64"
+          ],
+          "libcs": [
+            "glibc"
+          ],
+          "notes": "glibc hosts"
+        }
+      ],
+      "nixos": [
+        {
+          "kind": "nix-config",
+          "package": "zed-editor",
+          "label": "NixOS configuration",
+          "recommended": true,
+          "verified": true
+        },
+        {
+          "kind": "nix-profile",
+          "package": "zed-editor",
+          "label": "Nix profile"
+        },
+        {
+          "kind": "flatpak",
+          "package": "dev.zed.Zed",
+          "label": "Flathub",
+          "sandboxed": true
+        }
+      ]
+    }
+  }
+]
