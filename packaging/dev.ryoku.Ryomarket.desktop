@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Ryomarket
+Name=RyoMarket
 Comment=Find and manage Linux applications across package sources
 Exec=ryomarket
 Icon=dev.ryoku.Ryomarket

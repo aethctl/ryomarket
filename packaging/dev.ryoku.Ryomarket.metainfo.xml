@@ -3,12 +3,15 @@
   <id>dev.ryoku.Ryomarket</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-only</project_license>
-  <name>Ryomarket</name>
+  <name>RyoMarket</name>
   <summary>One place to find and manage Linux applications</summary>
   <description>
     <p>Ryomarket presents native distro packages, Flatpaks, AppImages, Nix packages and curated upstream builds as one application catalogue.</p>
     <p>Applications with multiple valid providers appear once and let the user choose the installation source.</p>
   </description>
+  <url type="homepage">https://github.com/aethctl/ryomarket</url>
+  <url type="bugtracker">https://github.com/aethctl/ryomarket/issues</url>
+  <releases><release version="0.2.0" date="2026-11-01" /></releases>
   <launchable type="desktop-id">dev.ryoku.Ryomarket.desktop</launchable>
   <developer id="dev.ryoku">
     <name>Ryoku</name>

@@ -168,3 +168,27 @@ func TestNixProfileSelectorUsesProfileName(t *testing.T) {
 		t.Fatalf("expected kdenlive, got %q", got)
 	}
 }
+
+func TestNixProfileUsesPinnedAppFlake(t *testing.T) {
+	v := model.Variant{Kind: model.ProviderNixProfile, Package: "ryoport", FlakeRef: "path:/nix/store/example-source?narHash=sha256-test", ProfileName: "ryoport"}
+	for _, op := range []Operation{Install, Remove, Update} {
+		plan, err := NixProfile().Plan(model.Application{ID: "ryoku:ryoport", Name: "Ryoport"}, model.DistroNixOS, v, op)
+		if err != nil {
+			t.Fatal(err)
+		}
+		step := plan.Steps[0]
+		if step.Elevated || step.Executable != "nix" {
+			t.Fatalf("unexpected step: %#v", step)
+		}
+		if op == Install && step.Args[len(step.Args)-1] != v.FlakeRef+"#ryoport" {
+			t.Fatalf("wrong source: %#v", step.Args)
+		}
+		if op != Install && step.Args[len(step.Args)-1] != "ryoport" {
+			t.Fatalf("wrong selector: %#v", step.Args)
+		}
+	}
+	v.FlakeRef = ""
+	if nixInstallable(v) != "nixpkgs#ryoport" {
+		t.Fatal("ordinary nixpkgs installation changed")
+	}
+}

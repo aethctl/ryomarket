@@ -33,6 +33,7 @@ func Load() (*Catalog, error) {
 	if err := json.Unmarshal(seed, &apps); err != nil {
 		return nil, fmt.Errorf("decode catalog: %w", err)
 	}
+	apps = append(apps, RyokuApplications()...)
 	c := &Catalog{
 		apps: apps, searchText: make([]string, len(apps)), searchName: make([]string, len(apps)), providerMasks: make([]uint16, len(apps)),
 		byID: make(map[string]int, len(apps)), byProvider: map[string]int{},
@@ -65,15 +66,15 @@ func validateApp(app model.Application) error {
 	}
 	validProviders := map[model.ProviderKind]bool{
 		model.ProviderDNF: true, model.ProviderPacman: true, model.ProviderXBPS: true,
-		model.ProviderNixProfile: true, model.ProviderNixConfig: true, model.ProviderFlatpak: true,
+		model.ProviderNixFlake: true, model.ProviderNixProfile: true, model.ProviderNixConfig: true, model.ProviderFlatpak: true,
 		model.ProviderAppImage: true, model.ProviderUpstream: true,
 	}
 	allowedProviders := map[model.Distro]map[model.ProviderKind]bool{
-		model.DistroFedora:  {model.ProviderDNF: true, model.ProviderNixProfile: true, model.ProviderFlatpak: true, model.ProviderAppImage: true, model.ProviderUpstream: true},
-		model.DistroArch:    {model.ProviderPacman: true, model.ProviderNixProfile: true, model.ProviderFlatpak: true, model.ProviderAppImage: true, model.ProviderUpstream: true},
-		model.DistroCachyOS: {model.ProviderPacman: true, model.ProviderNixProfile: true, model.ProviderFlatpak: true, model.ProviderAppImage: true, model.ProviderUpstream: true},
-		model.DistroVoid:    {model.ProviderXBPS: true, model.ProviderNixProfile: true, model.ProviderFlatpak: true, model.ProviderAppImage: true, model.ProviderUpstream: true},
-		model.DistroNixOS:   {model.ProviderNixProfile: true, model.ProviderNixConfig: true, model.ProviderFlatpak: true, model.ProviderAppImage: true, model.ProviderUpstream: true},
+		model.DistroFedora:  {model.ProviderDNF: true, model.ProviderNixFlake: true, model.ProviderNixProfile: true, model.ProviderFlatpak: true, model.ProviderAppImage: true, model.ProviderUpstream: true},
+		model.DistroArch:    {model.ProviderPacman: true, model.ProviderNixFlake: true, model.ProviderNixProfile: true, model.ProviderFlatpak: true, model.ProviderAppImage: true, model.ProviderUpstream: true},
+		model.DistroCachyOS: {model.ProviderPacman: true, model.ProviderNixFlake: true, model.ProviderNixProfile: true, model.ProviderFlatpak: true, model.ProviderAppImage: true, model.ProviderUpstream: true},
+		model.DistroVoid:    {model.ProviderXBPS: true, model.ProviderNixFlake: true, model.ProviderNixProfile: true, model.ProviderFlatpak: true, model.ProviderAppImage: true, model.ProviderUpstream: true},
+		model.DistroNixOS:   {model.ProviderNixFlake: true, model.ProviderNixProfile: true, model.ProviderNixConfig: true, model.ProviderFlatpak: true, model.ProviderAppImage: true, model.ProviderUpstream: true},
 	}
 	for distro, variants := range app.Variants {
 		if !validDistros[distro] {
@@ -95,6 +96,9 @@ func validateApp(app model.Application) error {
 				if variant.Kind == model.ProviderUpstream && strings.TrimSpace(variant.Entrypoint) == "" {
 					return fmt.Errorf("upstream provider is missing an entrypoint")
 				}
+			}
+			if variant.Kind == model.ProviderNixFlake && (app.Ecosystem == nil || !variant.Official || variant.FlakeRef == "" || variant.Entrypoint == "") {
+				return fmt.Errorf("Nix flake provider requires a bundled official installer")
 			}
 			if strings.TrimSpace(variant.Package) == "" {
 				return fmt.Errorf("%s provider is missing a package id", variant.Kind)
@@ -354,17 +358,48 @@ type BrowseResult struct {
 }
 
 func (c *Catalog) BrowseAllByProviders(query, category string, providers []model.ProviderKind) BrowseResult {
+	return c.browse(model.DistroUnknown, query, category, providers, false)
+}
+
+func (c *Catalog) BrowseFor(d model.Distro, query, category string, providers []model.ProviderKind, curated bool) BrowseResult {
+	return c.browse(d, query, category, providers, curated)
+}
+
+func (c *Catalog) browse(d model.Distro, query, category string, providers []model.ProviderKind, curated bool) BrowseResult {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	q := strings.ToLower(strings.TrimSpace(query))
 	cat := strings.ToLower(strings.TrimSpace(category))
 	wanted := providersMask(providers)
+	if providers != nil && wanted == 0 {
+		return BrowseResult{Categories: []string{"All"}}
+	}
 	seenCategories := map[string]struct{}{}
-	apps := make([]model.Application, 0, min(len(c.apps), searchResultLimit))
-	matches := make(browseHeap, 0, searchResultLimit)
+	capacity := min(len(c.apps), searchResultLimit)
+	if curated {
+		capacity = min(capacity, 32)
+	}
+	apps := make([]model.Application, 0, capacity)
+	var matches browseHeap
+	if q != "" {
+		matches = make(browseHeap, 0, searchResultLimit)
+	}
 	count := 0
 	for i, app := range c.apps {
-		if wanted != 0 && c.providerMasks[i]&wanted == 0 {
+		mask := c.providerMasks[i]
+		if d != model.DistroUnknown {
+			mask = 0
+			for _, v := range app.Variants[d] {
+				mask |= providerBit(v.Kind)
+			}
+			if mask == 0 {
+				continue
+			}
+		}
+		if curated && !c.curated[app.ID] {
+			continue
+		}
+		if wanted != 0 && mask&wanted == 0 {
 			continue
 		}
 		for _, name := range app.Categories {
@@ -506,7 +541,7 @@ func (c *Catalog) matchProvider(app model.Application) (int, bool) {
 			if variant.Package == "" {
 				continue
 			}
-			if index, ok := c.byProvider[providerKey(variant.Kind, variant.Package)]; ok {
+			if index, ok := c.byProvider[providerKey(variant.Kind, variant.Package)]; ok && c.apps[index].Ecosystem == nil {
 				return index, true
 			}
 		}
@@ -524,6 +559,9 @@ func (c *Catalog) matchName(name string) (int, bool) {
 		return 0, false
 	}
 	for index := range indexes {
+		if c.apps[index].Ecosystem != nil {
+			return 0, false
+		}
 		return index, true
 	}
 	return 0, false
@@ -795,6 +833,7 @@ func uniqueStrings(values []string) []string {
 }
 
 var providerKinds = []model.ProviderKind{
+	model.ProviderNixFlake,
 	model.ProviderDNF,
 	model.ProviderPacman,
 	model.ProviderXBPS,
@@ -807,6 +846,8 @@ var providerKinds = []model.ProviderKind{
 
 func providerBit(kind model.ProviderKind) uint16 {
 	switch kind {
+	case model.ProviderNixFlake:
+		return 1 << 8
 	case model.ProviderDNF:
 		return 1 << 0
 	case model.ProviderPacman:
@@ -906,4 +947,29 @@ func hasCategory(categories []string, want string) bool {
 		}
 	}
 	return false
+}
+
+func (c *Catalog) ProviderCountsFor(d model.Distro, providers []model.ProviderKind) (int, map[model.ProviderKind]int) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	wanted := providersMask(providers)
+	counts := map[model.ProviderKind]int{}
+	total := 0
+	for _, app := range c.apps {
+		var mask uint16
+		for _, v := range app.Variants[d] {
+			mask |= providerBit(v.Kind)
+		}
+		mask &= wanted
+		if mask == 0 {
+			continue
+		}
+		total++
+		for _, kind := range providerKinds {
+			if mask&providerBit(kind) != 0 {
+				counts[kind]++
+			}
+		}
+	}
+	return total, counts
 }

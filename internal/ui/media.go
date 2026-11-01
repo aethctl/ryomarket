@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"embed"
 	hexenc "encoding/hex"
 	"image"
 	_ "image/jpeg"
@@ -13,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 
@@ -31,11 +33,29 @@ type imageResult struct {
 	ok    bool
 }
 
+//go:embed assets/*.png
+var officialIcons embed.FS
+
 var mediaSlots = make(chan struct{}, 4)
 var metadataSlots = make(chan struct{}, 4)
 
 func (a *App) loadIcon(item model.Application) {
 	appID := item.ID
+	if item.Ecosystem != nil {
+		if _, ok := a.artwork(appID); ok {
+			return
+		}
+		data, err := officialIcons.ReadFile("assets/" + strings.TrimPrefix(appID, "ryoku:") + ".png")
+		if err == nil {
+			decoded, _, err := image.Decode(bytes.NewReader(data))
+			if err == nil {
+				a.mu.Lock()
+				a.images[appID] = paint.NewImageOp(decoded)
+				a.mu.Unlock()
+			}
+		}
+		return
+	}
 	if a.imageAssetSettled(appID, "icon", 0) {
 		return
 	}
@@ -59,6 +79,7 @@ func (a *App) loadIcon(item model.Application) {
 }
 
 func (a *App) loadApplicationScreenshots(item model.Application) {
+	a.loadLocalPreview(item.ID)
 	for index, rawURL := range item.Screenshots {
 		if index >= 4 {
 			break
@@ -324,4 +345,44 @@ func imageCachePath(rawURL string) string {
 	}
 	sum := sha256.Sum256([]byte(rawURL))
 	return filepath.Join(cacheHome, "ryomarket", "media", hexenc.EncodeToString(sum[:])+".img")
+}
+
+func (a *App) loadLocalPreview(id string) {
+	var names []string
+	switch id {
+	case "ryoku:ryotunes":
+		names = []string{"ryotunes-preview.png", "ryotunes-focus.png", "ryotunes-equaliser.png", "ryotunes-appearance.png"}
+	case "ryoku:ryomanager":
+		names = []string{"ryomanager-preview.png"}
+	}
+	for index, name := range names {
+		if _, ok := a.screenshot(id, index); ok {
+			continue
+		}
+		data, err := officialIcons.ReadFile("assets/" + name)
+		if err != nil {
+			continue
+		}
+		decoded, _, err := image.Decode(bytes.NewReader(data))
+		if err != nil {
+			continue
+		}
+		a.mu.Lock()
+		if a.screenshots[id] == nil {
+			a.screenshots[id] = map[int]paint.ImageOp{}
+		}
+		a.screenshots[id][index] = paint.NewImageOp(decoded)
+		a.mu.Unlock()
+	}
+}
+
+func (a *App) screenshotIndices(appID string) []int {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	indices := make([]int, 0, len(a.screenshots[appID]))
+	for index := range a.screenshots[appID] {
+		indices = append(indices, index)
+	}
+	sort.Ints(indices)
+	return indices
 }

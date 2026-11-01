@@ -40,6 +40,7 @@ const (
 	ProviderDNF        ProviderKind = "dnf"
 	ProviderPacman     ProviderKind = "pacman"
 	ProviderXBPS       ProviderKind = "xbps"
+	ProviderNixFlake   ProviderKind = "nix-flake"
 	ProviderNixProfile ProviderKind = "nix-profile"
 	ProviderNixConfig  ProviderKind = "nix-config"
 	ProviderFlatpak    ProviderKind = "flatpak"
@@ -55,6 +56,8 @@ func (p ProviderKind) DisplayName() string {
 		return "Native repository"
 	case ProviderXBPS:
 		return "Void repository"
+	case ProviderNixFlake:
+		return "Nix flake"
 	case ProviderNixProfile:
 		return "Nix profile"
 	case ProviderNixConfig:
@@ -76,6 +79,7 @@ type Variant struct {
 	Label         string       `json:"label,omitempty"`
 	Version       string       `json:"version,omitempty"`
 	Channel       string       `json:"channel,omitempty"`
+	FlakeRef      string       `json:"flake_ref,omitempty"`
 	SourceURL     string       `json:"source_url,omitempty"`
 	ReleaseRepo   string       `json:"release_repo,omitempty"`
 	AssetPattern  string       `json:"asset_pattern,omitempty"`
@@ -91,7 +95,14 @@ type Variant struct {
 	Notes         string       `json:"notes,omitempty"`
 }
 
+type EcosystemInfo struct {
+	Status        string `json:"status"`
+	Reason        string `json:"reason"`
+	PackageOutput string `json:"package_output,omitempty"`
+}
+
 type Application struct {
+	Ecosystem   *EcosystemInfo       `json:"ecosystem,omitempty"`
 	ID          string               `json:"id"`
 	Name        string               `json:"name"`
 	Summary     string               `json:"summary"`

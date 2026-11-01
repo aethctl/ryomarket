@@ -3,10 +3,10 @@ package ui
 import (
 	"context"
 	"fmt"
-	"image"
 	"image/color"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -16,7 +16,6 @@ import (
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/op/paint"
-	"gioui.org/text"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -31,9 +30,12 @@ import (
 )
 
 const (
-	viewDiscover  = "discover"
-	viewInstalled = "installed"
-	viewUpdates   = "updates"
+	viewDiscover    = "discover"
+	viewWelcome     = "welcome"
+	viewPreferences = "preferences"
+	viewBrowse      = "browse"
+	viewInstalled   = "installed"
+	viewUpdates     = "updates"
 )
 
 type txResult struct {
@@ -60,23 +62,75 @@ type catalogResult struct {
 }
 
 type App struct {
-	win      *app.Window
-	theme    *material.Theme
-	catalog  *catalog.Catalog
-	service  *service.Service
-	state    *state.Store
-	host     platform.Info
-	selected model.Distro
+	featureIndex       int
+	featureFrom        int
+	featureMotionStart time.Time
+	featurePrevious    widget.Clickable
+	featureNext        widget.Clickable
+	featureOpen        widget.Clickable
+	featureDots        map[string]*widget.Clickable
+	themeButtons       map[string]*widget.Clickable
+	preferenceButtons  map[string]*widget.Clickable
+	overrides          widget.Bool
+	advancedAppearance widget.Bool
+	skipWelcome        widget.Clickable
+	welcomeContinue    widget.Clickable
+	welcomeBack        widget.Clickable
+	welcomeStep        int
+	showConfig         bool
+	managementButtons  map[string]*widget.Clickable
+	managementRefresh  widget.Clickable
+	launchErrors       chan error
+	sourceDismiss      widget.Clickable
+	sourceSurface      widget.Clickable
+	navigationExpanded bool
+	navigationList     layout.List
+	transactionApp     string
+	transactionOutput  string
+	failedPlan         *provider.Plan
+	retryButton        widget.Clickable
+	transactionLogs    widget.Bool
+	win                *app.Window
+	theme              *material.Theme
+	catalog            *catalog.Catalog
+	service            *service.Service
+	state              *state.Store
+	host               platform.Info
+	selected           model.Distro
 
-	view         string
-	category     string
-	source       string
-	selectedID   string
-	lastQuery    string
-	query        widget.Editor
-	list         layout.List
-	detailList   layout.List
-	categoryList layout.List
+	view                  string
+	category              string
+	source                string
+	selectedID            string
+	lastQuery             string
+	query                 widget.Editor
+	advanced              widget.Bool
+	preference            widget.Enum
+	preferencesButton     widget.Clickable
+	collapseButton        widget.Clickable
+	searchButton          widget.Clickable
+	filtersButton         widget.Clickable
+	moreCategoriesButton  widget.Clickable
+	welcomeButton         widget.Clickable
+	saveAppearanceButton  widget.Clickable
+	resetAppearanceButton widget.Clickable
+	sourcesOpen           bool
+	moreCategories        bool
+	collapsed             bool
+	welcome               bool
+	reducedMotion         widget.Bool
+	appearanceMode        widget.Enum
+	accentEditor          widget.Editor
+	surfaceEditor         widget.Editor
+	galleryPrevious       widget.Clickable
+	galleryNext           widget.Clickable
+	galleryIndex          int
+	motionStart           time.Time
+	motionFrom            string
+	storefrontList        layout.List
+	list                  layout.List
+	detailList            layout.List
+	categoryList          layout.List
 
 	navButtons        map[string]*widget.Clickable
 	categoryButtons   map[string]*widget.Clickable
@@ -91,43 +145,44 @@ type App struct {
 	heroPrimaryButton widget.Clickable
 	heroDetailsButton widget.Clickable
 
-	variantSelection map[string]int
-	pending          *provider.Plan
-	busy             bool
-	checking         map[string]bool
-	metadata         map[string]metadata.FlathubApp
-	metadataLoading  map[string]bool
-	metadataFailedAt map[string]time.Time
-	images           map[string]paint.ImageOp
-	screenshots      map[string]map[int]paint.ImageOp
-	imageLoading     map[string]bool
-	imageFailedAt    map[string]time.Time
-	themeKey         string
-	nextThemeCheck   time.Time
-	installed        []service.Installed
-	installedApps    []model.Application
-	updates          []service.Update
-	updateApps       []model.Application
-	scanBusy         bool
-	status           string
-	statusBad        bool
-	catalogLoading   bool
-	catalogPending   int
-	catalogTotal     int
-	catalogEpoch     uint64
-	discoverCacheKey string
-	discoverApps     []model.Application
-	discoverCats     []string
-	discoverCount    int
-	sourceCounts     map[string]int
-	installedIDs     map[string]struct{}
+	variantSelection     map[string]int
+	pending              *provider.Plan
+	busy                 bool
+	checking             map[string]bool
+	metadata             map[string]metadata.FlathubApp
+	metadataLoading      map[string]bool
+	metadataFailedAt     map[string]time.Time
+	images               map[string]paint.ImageOp
+	screenshots          map[string]map[int]paint.ImageOp
+	imageLoading         map[string]bool
+	imageFailedAt        map[string]time.Time
+	themeKey             string
+	installed            []service.Installed
+	installedApps        []model.Application
+	updates              []service.Update
+	updateApps           []model.Application
+	scanBusy             bool
+	scanUpdatesRequested bool
+	status               string
+	statusBad            bool
+	catalogLoading       bool
+	catalogPending       int
+	catalogTotal         int
+	catalogEpoch         uint64
+	discoverCacheKey     string
+	discoverApps         []model.Application
+	discoverCats         []string
+	discoverCount        int
+	sourceCounts         map[string]int
+	installedIDs         map[string]struct{}
 
-	txCh       chan txResult
-	scanCh     chan scanResult
-	metadataCh chan metadataResult
-	imageCh    chan imageResult
-	catalogCh  chan catalogResult
-	mu         sync.RWMutex
+	hoverStates map[string]*hoverState
+	txCh        chan txResult
+	scanCh      chan scanResult
+	metadataCh  chan metadataResult
+	imageCh     chan imageResult
+	catalogCh   chan catalogResult
+	mu          sync.RWMutex
 }
 
 func Run() error {
@@ -165,9 +220,9 @@ func Run() error {
 
 	win := new(app.Window)
 	win.Option(
-		app.Title("Ryomarket"),
+		app.Title("RyoMarket"),
 		app.Size(unit.Dp(1280), unit.Dp(820)),
-		app.MinSize(unit.Dp(980), unit.Dp(680)),
+		app.MinSize(unit.Dp(760), unit.Dp(600)),
 	)
 
 	cachedTotal, providerCounts := c.ProviderCounts()
@@ -218,15 +273,37 @@ func Run() error {
 		imageCh:          make(chan imageResult, 4),
 		catalogCh:        make(chan catalogResult, 4),
 	}
+	a.preference.Value = string(st.Data.PreferredProvider)
+	a.appearanceMode.Value = st.Data.Appearance.Mode
+	a.accentEditor.SingleLine, a.surfaceEditor.SingleLine = true, true
+	a.accentEditor.SetText(st.Data.Appearance.Accent)
+	a.surfaceEditor.SetText(st.Data.Appearance.Surface)
+	a.reducedMotion.Value = st.Data.Appearance.ReducedMotion
+	a.welcome = !st.Data.WelcomeDone && len(st.Data.Transactions) == 0
+	if a.welcome {
+		a.view = viewWelcome
+	}
+	a.featureDots = map[string]*widget.Clickable{}
+	a.themeButtons = map[string]*widget.Clickable{}
+	a.preferenceButtons = map[string]*widget.Clickable{}
+	a.managementButtons = map[string]*widget.Clickable{}
+	a.launchErrors = make(chan error, 4)
+	a.overrides.Value = st.Data.Appearance.Accent != "" || st.Data.Appearance.Surface != ""
+	a.storefrontList.Axis = layout.Vertical
+	a.navigationList.Axis = layout.Vertical
+	colors = applyAppearance(loadPalette(), st.Data.Appearance)
+	a.theme = newTheme()
+	a.refreshCatalogStats()
 	a.themeKey = themeStateKey()
 	a.query.SingleLine = true
-	for _, key := range []string{viewDiscover, viewInstalled, viewUpdates} {
+	for _, key := range []string{viewDiscover, viewBrowse, viewInstalled, viewUpdates} {
 		a.navButtons[key] = new(widget.Clickable)
 	}
 	if selected != model.DistroUnknown {
 		a.startScan(false)
 	}
 	a.startCatalogRefresh()
+	go a.watchTheme()
 
 	go func() {
 		if err := a.loop(); err != nil {
@@ -254,6 +331,15 @@ func (a *App) loop() error {
 }
 
 func (a *App) consumeAsync() {
+	for {
+		select {
+		case err := <-a.launchErrors:
+			a.status, a.statusBad = err.Error(), true
+		default:
+			goto metadata
+		}
+	}
+metadata:
 	for {
 		select {
 		case result := <-a.metadataCh:
@@ -304,7 +390,9 @@ transactions:
 		case result := <-a.txCh:
 			a.busy = false
 			if result.err != nil {
-				a.status = transactionError(result.err, result.output)
+				a.transactionOutput = transactionError(result.err, result.output)
+				a.failedPlan = &result.plan
+				a.status = "The change could not be completed. Try again or choose another source."
 				a.statusBad = true
 			} else {
 				a.status = result.plan.Summary() + " complete"
@@ -336,6 +424,10 @@ scans:
 				a.installedIDs[installed.App.ID] = struct{}{}
 			}
 			a.scanBusy = false
+			if a.scanUpdatesRequested {
+				a.scanUpdatesRequested = false
+				a.startScan(true)
+			}
 		default:
 			goto catalogue
 		}
@@ -370,126 +462,43 @@ catalogue:
 }
 
 func (a *App) refreshTheme(gtx layout.Context) {
-	if a.nextThemeCheck.IsZero() || !gtx.Now.Before(a.nextThemeCheck) {
-		a.nextThemeCheck = gtx.Now.Add(time.Second)
-		key := themeStateKey()
-		if key != a.themeKey {
-			colors = loadPalette()
-			a.theme = newTheme()
-			a.themeKey = key
-		}
+	key := themeStateKey()
+	if key != a.themeKey {
+		colors = applyAppearance(loadPalette(), a.state.Data.Appearance)
+		a.theme = newTheme()
+		a.themeKey = key
 	}
-	gtx.Execute(op.InvalidateCmd{At: a.nextThemeCheck})
 }
 
 func (a *App) layout(gtx layout.Context) layout.Dimensions {
 	a.refreshTheme(gtx)
+	a.shortcuts(gtx)
 	fill(gtx, colors.bg)
-	return layout.UniformInset(unit.Dp(8)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		return widget.Border{Color: colors.line, CornerRadius: unit.Dp(10), Width: unit.Dp(1)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			return roundedBackground(gtx, colors.bg, unit.Dp(10), func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
-					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						gtx.Constraints.Min.X = gtx.Dp(unit.Dp(268))
-						gtx.Constraints.Max.X = gtx.Constraints.Min.X
-						return a.rail(gtx)
-					}),
-					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						gtx.Constraints.Min.X = gtx.Dp(unit.Dp(1))
-						gtx.Constraints.Max.X = gtx.Constraints.Min.X
-						fill(gtx, colors.line)
-						return layout.Dimensions{Size: gtx.Constraints.Min}
-					}),
-					layout.Flexed(1, a.content),
-				)
-			})
-		})
-	})
-}
-
-func (a *App) rail(gtx layout.Context) layout.Dimensions {
-	fill(gtx, colors.rail)
-	return layout.Inset{Top: unit.Dp(18), Bottom: unit.Dp(14), Left: unit.Dp(16), Right: unit.Dp(16)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-			layout.Rigid(a.brandBlock),
-			layout.Rigid(layout.Spacer{Height: unit.Dp(14)}.Layout),
-			layout.Rigid(a.searchBox),
-			layout.Rigid(layout.Spacer{Height: unit.Dp(20)}.Layout),
-			layout.Rigid(a.railLabel("BROWSE")),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				return a.navItem(gtx, viewDiscover, "Discover", "発見", "")
-			}),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				sub := fmt.Sprintf("%d detected", len(a.installed))
-				if a.scanBusy && len(a.installed) == 0 {
-					sub = "Scanning this system"
-				}
-				return a.navItem(gtx, viewInstalled, "Installed", "導入", sub)
-			}),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				sub := fmt.Sprintf("%d updates available", len(a.updates))
-				return a.navItem(gtx, viewUpdates, "Updates", "更新", sub)
-			}),
-			layout.Rigid(layout.Spacer{Height: unit.Dp(18)}.Layout),
-			layout.Rigid(a.railLabel("SOURCES")),
-			layout.Rigid(a.sourceRail),
-			layout.Flexed(1, func(gtx layout.Context) layout.Dimensions { return layout.Dimensions{Size: gtx.Constraints.Min} }),
-			layout.Rigid(a.railLabel("SYSTEM")),
-			layout.Rigid(a.systemCard),
-			layout.Rigid(layout.Spacer{Height: unit.Dp(8)}.Layout),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				if a.refreshButton.Clicked(gtx) && !a.scanBusy && a.host.Distro != model.DistroUnknown {
-					a.startScan(a.view == viewUpdates)
-				}
-				text := "REFRESH STATUS"
-				if a.scanBusy {
-					text = "SCANNING…"
-				}
-				style := button(a.theme, &a.refreshButton, text, false)
-				style.TextSize = unit.Sp(10)
-				style.Inset = layout.Inset{Top: unit.Dp(7), Bottom: unit.Dp(7), Left: unit.Dp(11), Right: unit.Dp(11)}
-				gtx.Constraints.Min.X = 0
-				return style.Layout(gtx)
-			}),
-		)
-	})
-}
-
-func (a *App) brandBlock(gtx layout.Context) layout.Dimensions {
-	return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
+	if a.view == viewWelcome {
+		return a.onboarding(gtx)
+	}
+	compact := a.collapsed || (!a.navigationExpanded && gtx.Constraints.Max.X < gtx.Dp(unit.Dp(1050)))
+	width := unit.Dp(204)
+	if compact {
+		width = 68
+	}
+	return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			gtx.Constraints.Min = image.Pt(gtx.Dp(unit.Dp(42)), gtx.Dp(unit.Dp(42)))
-			gtx.Constraints.Max = gtx.Constraints.Min
-			return widget.Border{Color: colors.line, CornerRadius: unit.Dp(6), Width: unit.Dp(1)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return roundedBackground(gtx, colors.surface2, unit.Dp(6), func(gtx layout.Context) layout.Dimensions {
-					return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-						gtx.Constraints.Min = image.Point{}
-						l := jpLabel(a.theme, unit.Sp(21), "力", colors.accent)
-						l.Font.Weight = font.Bold
-						l.Alignment = text.Middle
-						return l.Layout(gtx)
-					})
-				})
-			})
+			gtx.Constraints.Min.X = gtx.Dp(width)
+			gtx.Constraints.Max.X = gtx.Constraints.Min.X
+			return a.navigation(gtx, compact)
 		}),
-		layout.Rigid(layout.Spacer{Width: unit.Dp(12)}.Layout),
-		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-				layout.Rigid(mediumLabel(a.theme, unit.Sp(16), "RYOKU", colors.bright).Layout),
-				layout.Rigid(layout.Spacer{Height: unit.Dp(1)}.Layout),
-				layout.Rigid(mediumLabel(a.theme, unit.Sp(9), "MARKET", colors.subtle).Layout),
-			)
-		}),
+		layout.Flexed(1, a.content),
 	)
 }
 
 func (a *App) searchBox(gtx layout.Context) layout.Dimensions {
-	hint := "⌕  Search apps"
-	count := a.sourceCount(a.source)
-	if count > 0 {
-		hint = fmt.Sprintf("⌕  Search %s apps", formatCount(count))
+	hint := "Search applications"
+	border := colors.line
+	if gtx.Focused(&a.query) {
+		border = colors.accent
 	}
-	return boxed(gtx, colors.surface, colors.line, unit.Dp(8), func(gtx layout.Context) layout.Dimensions {
+	return boxed(gtx, colors.surface, border, unit.Dp(8), func(gtx layout.Context) layout.Dimensions {
 		ed := material.Editor(a.theme, &a.query, hint)
 		ed.TextSize = unit.Sp(13)
 		ed.Color = colors.bright
@@ -499,98 +508,20 @@ func (a *App) searchBox(gtx layout.Context) layout.Dimensions {
 	})
 }
 
-func (a *App) railLabel(value string) layout.Widget {
-	return func(gtx layout.Context) layout.Dimensions {
-		return layout.Inset{Left: unit.Dp(2), Bottom: unit.Dp(7)}.Layout(gtx, mediumLabel(a.theme, unit.Sp(9), value, colors.dim).Layout)
-	}
-}
-
-func (a *App) navItem(gtx layout.Context, key, name, jp, subtitle string) layout.Dimensions {
-	click := a.navButtons[key]
-	if click.Clicked(gtx) {
-		a.view = key
-		a.selectedID = ""
-		a.pending = nil
-		a.list.Position = layout.Position{}
-		if key == viewInstalled || key == viewUpdates {
-			a.startScan(key == viewUpdates)
-		}
-	}
-	active := a.view == key
-	fg := colors.cream
-	sub := colors.dim
-	jpColor := colors.dim
-	bg := color.NRGBA{}
-	if active {
-		bg = colors.bone
-		fg = hex(0x000000)
-		sub = hex(0x000000)
-		jpColor = hex(0x000000)
-	}
-	return click.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		content := func(gtx layout.Context) layout.Dimensions {
-			return layout.Inset{Top: unit.Dp(9), Bottom: unit.Dp(9), Left: unit.Dp(10), Right: unit.Dp(9)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
-					layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-						children := []layout.FlexChild{
-							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								l := mediumLabel(a.theme, unit.Sp(15), name, fg)
-								if active {
-									l.Color = hex(0x000000)
-									l.Font.Weight = font.Bold
-								}
-								return l.Layout(gtx)
-							}),
-						}
-						if strings.TrimSpace(subtitle) != "" {
-							children = append(children,
-								layout.Rigid(layout.Spacer{Height: unit.Dp(2)}.Layout),
-								layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-									l := mediumLabel(a.theme, unit.Sp(10), subtitle, sub)
-									if active {
-										l.Color = hex(0x000000)
-										l.Font.Weight = font.Medium
-									}
-									l.MaxLines = 1
-									return l.Layout(gtx)
-								}),
-							)
-						}
-						return layout.Flex{Axis: layout.Vertical}.Layout(gtx, children...)
-					}),
-					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						l := jpLabel(a.theme, unit.Sp(11), jp, jpColor)
-						if active {
-							l.Color = hex(0x000000)
-							l.Font.Weight = font.Bold
-						}
-						return l.Layout(gtx)
-					}),
-				)
-			})
-		}
-		if active {
-			return roundedBackground(gtx, bg, unit.Dp(6), content)
-		}
-		if click.Hovered() {
-			return roundedBackground(gtx, colors.surface, unit.Dp(6), content)
-		}
-		return content(gtx)
-	})
-}
-
 func (a *App) content(gtx layout.Context) layout.Dimensions {
-	query := a.query.Text()
-	if query != a.lastQuery && strings.TrimSpace(query) != "" && a.view != viewDiscover {
-		a.view = viewDiscover
+	if a.query.Text() != a.lastQuery && strings.TrimSpace(a.query.Text()) != "" && a.view != viewBrowse {
+		a.view = viewBrowse
 		a.selectedID = ""
 		a.list.Position = layout.Position{}
 	}
-	return layout.Inset{Top: unit.Dp(18), Bottom: unit.Dp(0), Left: unit.Dp(28), Right: unit.Dp(28)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+	inset := unit.Dp(32)
+	if gtx.Constraints.Max.X < gtx.Dp(unit.Dp(800)) {
+		inset = 22
+	}
+	return layout.Inset{Top: unit.Dp(26), Left: inset, Right: inset, Bottom: unit.Dp(12)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 		return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 			layout.Rigid(a.header),
-			layout.Rigid(layout.Spacer{Height: unit.Dp(16)}.Layout),
-			layout.Flexed(1, a.body),
+			layout.Flexed(1, func(gtx layout.Context) layout.Dimensions { return a.navigationMotion(gtx, a.body) }),
 			layout.Rigid(a.footer),
 		)
 	})
@@ -598,46 +529,73 @@ func (a *App) content(gtx layout.Context) layout.Dimensions {
 
 func (a *App) header(gtx layout.Context) layout.Dimensions {
 	if a.selectedID != "" {
-		return label(a.theme, unit.Sp(9), "力  SOFTWARE", colors.dim).Layout(gtx)
+		return layout.Dimensions{}
+	}
+	title, sub := "Discover", ""
+	switch a.view {
+	case viewBrowse:
+		title, sub = "Browse all", fmt.Sprintf("%s %s", formatCount(a.headerCount()), choose(a.headerCount() == 1, "application", "applications"))
+	case viewInstalled:
+		title, sub = "Installed", fmt.Sprintf("%d applications", len(a.installedApps))
+	case viewUpdates:
+		title, sub = "Updates", "Keep your applications current"
+	case viewPreferences:
+		title, sub = "Preferences", ""
+	}
+	if a.selectedID != "" {
+		title, sub = "Application", "Software details"
 	}
 
-	title := "Discover"
-	sub := "One software catalogue across every Ryoku distro."
-	if a.view == viewInstalled {
-		title, sub = "Installed", "Software Ryomarket can identify on this system."
-	} else if a.view == viewUpdates {
-		title, sub = "Updates", "Provider-aware updates without duplicate listings."
-	}
-	count := a.headerCount()
-	return layout.Flex{Axis: layout.Horizontal, Alignment: layout.End}.Layout(gtx,
-		layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-			return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-				layout.Rigid(label(a.theme, unit.Sp(9), "力  BROWSE", colors.dim).Layout),
-				layout.Rigid(layout.Spacer{Height: unit.Dp(5)}.Layout),
-				layout.Rigid(displayLabel(a.theme, unit.Sp(30), title, colors.bright).Layout),
-				layout.Rigid(layout.Spacer{Height: unit.Dp(3)}.Layout),
-				layout.Rigid(label(a.theme, unit.Sp(13), sub, colors.subtle).Layout),
-			)
-		}),
-		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return layout.Inset{Bottom: unit.Dp(2)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Vertical, Alignment: layout.End}.Layout(gtx,
-					layout.Rigid(label(a.theme, unit.Sp(22), fmt.Sprintf("%d", count), colors.bright).Layout),
-					layout.Rigid(label(a.theme, unit.Sp(8), choose(count == 1, "APP", "APPS"), colors.dim).Layout),
+	return layout.Inset{Bottom: unit.Dp(22)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+		return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
+			layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
+				return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
+					layout.Rigid(heading(a.theme, unit.Sp(20), title, colors.bright).Layout),
+					layout.Rigid(layout.Spacer{Height: unit.Dp(3)}.Layout),
+					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+						if sub == "" {
+							return layout.Dimensions{}
+						}
+						return label(a.theme, unit.Sp(12), sub, colors.subtle).Layout(gtx)
+					}),
 				)
-			})
-		}),
-	)
+			}),
+			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+				if a.view != viewBrowse {
+					return layout.Dimensions{}
+				}
+				if a.filtersButton.Clicked(gtx) {
+					a.sourcesOpen = !a.sourcesOpen
+				}
+				return button(a.theme, &a.filtersButton, "Sources & categories", false).Layout(gtx)
+			}),
+		)
+	})
 }
 
 func (a *App) ensureDiscoverCache() {
-	key := fmt.Sprintf("%d\x00%s\x00%s\x00%s", a.catalogEpoch, a.source, a.category, a.query.Text())
+	key := fmt.Sprintf("%d\x00%s\x00%s\x00%s", a.catalogEpoch, a.source, a.category, a.query.Text()+fmt.Sprint(a.advanced.Value)+a.view)
 	if key == a.discoverCacheKey {
 		return
 	}
-	result := a.catalog.BrowseAllByProviders(a.query.Text(), a.category, sourceKinds(a.source))
+	providers := sourceKinds(a.source)
+	if a.source == sourceAll {
+		providers = a.browseProviders()
+	}
+	curated := a.view != viewBrowse && strings.TrimSpace(a.query.Text()) == "" && a.source == sourceAll && a.category == "All"
+	result := a.catalog.BrowseFor(a.selected, a.query.Text(), a.category, providers, curated)
 	a.discoverCacheKey = key
 	a.discoverApps = result.Apps
+	if q := strings.ToLower(strings.TrimSpace(a.query.Text())); q != "" && a.source == sourceAll && a.category == "All" {
+		var official []model.Application
+		for _, app := range catalog.RyokuApplications() {
+			if strings.Contains(strings.ToLower(app.Name), q) {
+				official = append(official, app)
+			}
+		}
+		a.discoverApps = append(official, a.discoverApps...)
+		result.Count += len(official)
+	}
 	a.discoverCats = result.Categories
 	a.discoverCount = result.Count
 }
@@ -660,164 +618,23 @@ func (a *App) headerCount() int {
 
 func (a *App) body(gtx layout.Context) layout.Dimensions {
 	if a.selectedID != "" {
-		if appItem, ok := a.catalog.App(a.selectedID); ok {
-			return a.detail(gtx, appItem)
+		if item, ok := a.catalog.App(a.selectedID); ok {
+			return a.detail(gtx, item)
 		}
 		a.selectedID = ""
 	}
 	switch a.view {
+	case viewPreferences:
+		return a.preferences(gtx)
 	case viewInstalled:
 		return a.installedView(gtx)
 	case viewUpdates:
 		return a.updatesView(gtx)
+	case viewBrowse:
+		return a.browse(gtx)
 	default:
-		return a.discover(gtx)
+		return a.editorialStorefront(gtx)
 	}
-}
-
-func (a *App) discover(gtx layout.Context) layout.Dimensions {
-	query := a.query.Text()
-	if query != a.lastQuery {
-		a.lastQuery = query
-		a.list.Position = layout.Position{}
-	}
-	a.ensureDiscoverCache()
-	cats := a.discoverCats
-	apps := a.discoverApps
-	for _, cat := range cats {
-		if a.categoryButtons[cat] == nil {
-			a.categoryButtons[cat] = new(widget.Clickable)
-		}
-	}
-	if len(apps) == 0 {
-		return a.empty(gtx, "NO MATCHES", "Try another search or category.")
-	}
-
-	showHero := strings.TrimSpace(query) == "" && strings.EqualFold(a.category, "All") && a.source == sourceAll
-	children := make([]layout.FlexChild, 0, 6)
-	if showHero {
-		children = append(children,
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions { return a.hero(gtx, apps[0]) }),
-			layout.Rigid(layout.Spacer{Height: unit.Dp(12)}.Layout),
-		)
-	}
-	children = append(children,
-		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			gtx.Constraints.Max.Y = gtx.Dp(unit.Dp(38))
-			return a.categoryList.Layout(gtx, len(cats), func(gtx layout.Context, index int) layout.Dimensions {
-				return a.categoryChip(gtx, cats[index])
-			})
-		}),
-		layout.Rigid(layout.Spacer{Height: unit.Dp(10)}.Layout),
-		layout.Flexed(1, func(gtx layout.Context) layout.Dimensions { return a.appGrid(gtx, apps) }),
-	)
-	return layout.Flex{Axis: layout.Vertical}.Layout(gtx, children...)
-}
-
-func (a *App) hero(gtx layout.Context, item model.Application) layout.Dimensions {
-	a.loadMetadata(item)
-	display := a.enriched(item)
-	gtx.Constraints.Min.Y = gtx.Dp(unit.Dp(232))
-	gtx.Constraints.Max.Y = gtx.Constraints.Min.Y
-
-	if a.heroDetailsButton.Clicked(gtx) {
-		a.openDetail(item)
-	}
-	return widget.Border{Color: colors.line, CornerRadius: unit.Dp(6), Width: unit.Dp(1)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		return roundedBackground(gtx, colors.surface, unit.Dp(6), func(gtx layout.Context) layout.Dimensions {
-			return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
-				layout.Flexed(0.54, func(gtx layout.Context) layout.Dimensions {
-					return layout.Inset{Top: unit.Dp(24), Bottom: unit.Dp(20), Left: unit.Dp(24), Right: unit.Dp(18)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-						variantIndex := a.defaultVariant(item)
-						providerName := "No host source"
-						if variants := item.Variants[a.selected]; variantIndex >= 0 && variantIndex < len(variants) {
-							providerName = variantName(variants[variantIndex])
-						}
-						return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-							layout.Rigid(label(a.theme, unit.Sp(8), strings.ToUpper(firstCategory(display)), colors.dim).Layout),
-							layout.Rigid(layout.Spacer{Height: unit.Dp(10)}.Layout),
-							layout.Rigid(displayLabel(a.theme, unit.Sp(29), display.Name, colors.bright).Layout),
-							layout.Rigid(layout.Spacer{Height: unit.Dp(7)}.Layout),
-							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								l := label(a.theme, unit.Sp(12), display.Summary, colors.subtle)
-								l.MaxLines = 2
-								return l.Layout(gtx)
-							}),
-							layout.Rigid(layout.Spacer{Height: unit.Dp(9)}.Layout),
-							layout.Rigid(label(a.theme, unit.Sp(8), "•  "+strings.ToUpper(providerName), colors.dim).Layout),
-							layout.Flexed(1, func(gtx layout.Context) layout.Dimensions { return layout.Dimensions{Size: gtx.Constraints.Min} }),
-							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-								return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
-									layout.Rigid(func(gtx layout.Context) layout.Dimensions { return a.heroPrimary(gtx, item, variantIndex) }),
-									layout.Rigid(layout.Spacer{Width: unit.Dp(8)}.Layout),
-									layout.Rigid(button(a.theme, &a.heroDetailsButton, "VIEW DETAILS", false).Layout),
-								)
-							}),
-						)
-					})
-				}),
-				layout.Flexed(0.46, func(gtx layout.Context) layout.Dimensions {
-					return a.heroMedia(gtx, item, display)
-				}),
-			)
-		})
-	})
-}
-
-func (a *App) heroPrimary(gtx layout.Context, item model.Application, variantIndex int) layout.Dimensions {
-	if variantIndex < 0 || variantIndex >= len(item.Variants[a.selected]) {
-		if a.heroPrimaryButton.Clicked(gtx) {
-			a.openDetail(item)
-		}
-		return button(a.theme, &a.heroPrimaryButton, "BROWSE", true).Layout(gtx)
-	}
-	if !a.service.VariantAvailable(a.selected, item.Variants[a.selected][variantIndex]) {
-		if a.heroPrimaryButton.Clicked(gtx) {
-			a.openDetail(item)
-		}
-		return button(a.theme, &a.heroPrimaryButton, "VIEW SOURCES", true).Layout(gtx)
-	}
-	installed := a.service.VariantInstalled(item.ID, variantIndex)
-	text := "INSTALL"
-	if installed {
-		text = "INSTALLED"
-	}
-	if a.busy {
-		text = "WORKING…"
-	}
-	if a.heroPrimaryButton.Clicked(gtx) && !a.busy {
-		if installed {
-			a.openDetail(item)
-		} else {
-			plan, err := a.service.Plan(item, a.selected, variantIndex, provider.Install)
-			if err != nil {
-				a.status, a.statusBad = err.Error(), true
-			} else {
-				a.openDetail(item)
-				a.pending = &plan
-			}
-		}
-	}
-	return button(a.theme, &a.heroPrimaryButton, text, true).Layout(gtx)
-}
-
-func (a *App) categoryChip(gtx layout.Context, category string) layout.Dimensions {
-	click := a.categoryButtons[category]
-	if click.Clicked(gtx) {
-		a.category = category
-		a.list.Position = layout.Position{}
-	}
-	active := strings.EqualFold(a.category, category)
-	return layout.Inset{Right: unit.Dp(7)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		style := button(a.theme, click, strings.ToUpper(category), active)
-		style.TextSize = unit.Sp(8)
-		style.Inset = layout.Inset{Top: unit.Dp(7), Bottom: unit.Dp(7), Left: unit.Dp(12), Right: unit.Dp(12)}
-		if !active {
-			style.Background = colors.surface
-			style.Color = colors.dim
-		}
-		return style.Layout(gtx)
-	})
 }
 
 func (a *App) appGrid(gtx layout.Context, apps []model.Application) layout.Dimensions {
@@ -856,169 +673,59 @@ func (a *App) appGrid(gtx layout.Context, apps []model.Application) layout.Dimen
 
 func (a *App) appCard(gtx layout.Context, item model.Application) layout.Dimensions {
 	a.loadIcon(item)
-	display := a.enriched(item)
-	click := a.cardButtons[item.ID]
-	if click == nil {
-		click = new(widget.Clickable)
-		a.cardButtons[item.ID] = click
-	}
+	click := a.cardClick(item)
 	if click.Clicked(gtx) {
 		a.openDetail(item)
 	}
-	gtx.Constraints.Min.Y = gtx.Dp(unit.Dp(240))
+	height := unit.Dp(174)
+	gtx.Constraints.Min.Y = gtx.Dp(height)
 	gtx.Constraints.Max.Y = gtx.Constraints.Min.Y
-	border := colors.line
-	if click.Hovered() {
-		border = colors.strong
+	bg := colors.surface2
+	focused := gtx.Focused(click)
+	if click.Hovered() || focused {
+		bg = blendColor(bg, colors.accent, 0.08)
 	}
 	return click.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		return widget.Border{Color: border, CornerRadius: unit.Dp(6), Width: unit.Dp(1)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			return roundedBackground(gtx, colors.surface, unit.Dp(6), func(gtx layout.Context) layout.Dimensions {
+		return roundedBackground(gtx, bg, unit.Dp(8), func(gtx layout.Context) layout.Dimensions {
+			return layout.UniformInset(unit.Dp(16)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 				return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						gtx.Constraints.Min.Y = gtx.Dp(unit.Dp(132))
-						gtx.Constraints.Max.Y = gtx.Constraints.Min.Y
-						return a.posterArt(gtx, display, false)
+						return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
+							layout.Rigid(func(gtx layout.Context) layout.Dimensions { return a.applicationIcon(gtx, item, 72) }),
+							layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
+								text := ""
+								if a.appInstalled(item.ID) {
+									text = "Installed"
+								}
+								if item.Ecosystem != nil && !item.Supports(a.selected) {
+									text = "Upcoming"
+								}
+								return layout.E.Layout(gtx, label(a.theme, unit.Sp(11), text, colors.subtle).Layout)
+							}),
+						)
 					}),
-					layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-						return layout.Inset{Top: unit.Dp(10), Bottom: unit.Dp(9), Left: unit.Dp(11), Right: unit.Dp(11)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-							providerName := a.providerName(item)
-							return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-								layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-									return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
-										layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-											l := displayLabel(a.theme, unit.Sp(15), display.Name, colors.bright)
-											l.MaxLines = 1
-											return l.Layout(gtx)
-										}),
-										layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-											return boxed(gtx, colors.surface2, colors.line, unit.Dp(4), mediumLabel(a.theme, unit.Sp(7), scopeSummary(item), colors.subtle).Layout)
-										}),
-									)
-								}),
-								layout.Rigid(layout.Spacer{Height: unit.Dp(4)}.Layout),
-								layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-									l := label(a.theme, unit.Sp(10), display.Summary, colors.subtle)
-									l.MaxLines = 2
-									return l.Layout(gtx)
-								}),
-								layout.Flexed(1, func(gtx layout.Context) layout.Dimensions { return layout.Dimensions{Size: gtx.Constraints.Min} }),
-								layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-									return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
-										layout.Rigid(label(a.theme, unit.Sp(8), strings.ToUpper(providerName), colors.dim).Layout),
-										layout.Flexed(1, func(gtx layout.Context) layout.Dimensions { return layout.Dimensions{Size: gtx.Constraints.Min} }),
-										layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-											if !a.appInstalled(item.ID) {
-												return layout.Dimensions{}
-											}
-											return boxed(gtx, colors.surface2, colors.strong, unit.Dp(4), label(a.theme, unit.Sp(7), "INSTALLED", colors.subtle).Layout)
-										}),
-									)
-								}),
-							)
-						})
+					layout.Rigid(layout.Spacer{Height: unit.Dp(14)}.Layout),
+					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+						l := heading(a.theme, unit.Sp(16), item.Name, colors.bright)
+						l.MaxLines = 1
+						return l.Layout(gtx)
+					}),
+					layout.Rigid(layout.Spacer{Height: unit.Dp(5)}.Layout),
+					layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+						text := a.providerName(item)
+						if item.Ecosystem != nil && !item.Supports(a.selected) {
+							text = "By Ryoku"
+						}
+						if click.Hovered() || focused {
+							text = item.Summary
+						}
+						l := label(a.theme, unit.Sp(12), text, colors.subtle)
+						l.MaxLines = 1
+						return l.Layout(gtx)
 					}),
 				)
 			})
 		})
-	})
-}
-
-func (a *App) posterArt(gtx layout.Context, item model.Application, large bool) layout.Dimensions {
-	icon := unit.Dp(76)
-	circle := unit.Dp(104)
-	fontSize := unit.Sp(34)
-	if large {
-		icon = unit.Dp(128)
-		circle = unit.Dp(176)
-		fontSize = unit.Sp(54)
-	}
-	return roundedBackground(gtx, colors.surface2, unit.Dp(5), func(gtx layout.Context) layout.Dimensions {
-		return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			if imageOp, ok := a.artwork(item.ID); ok {
-				gtx.Constraints.Min = image.Pt(gtx.Dp(icon), gtx.Dp(icon))
-				gtx.Constraints.Max = gtx.Constraints.Min
-				im := widget.Image{Src: imageOp, Fit: widget.Contain, Position: layout.Center}
-				return im.Layout(gtx)
-			}
-			gtx.Constraints.Min = image.Pt(gtx.Dp(circle), gtx.Dp(circle))
-			gtx.Constraints.Max = gtx.Constraints.Min
-			return widget.Border{Color: colors.line, CornerRadius: circle / 2, Width: unit.Dp(1)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					gtx.Constraints.Min = image.Point{}
-					l := displayLabel(a.theme, fontSize, initials(item.Name), colors.bright)
-					l.Alignment = text.Middle
-					return l.Layout(gtx)
-				})
-			})
-		})
-	})
-}
-
-func (a *App) heroMedia(gtx layout.Context, item model.Application, display model.Application) layout.Dimensions {
-	if imageOp, ok := a.screenshot(item.ID, 0); ok {
-		return roundedBackground(gtx, colors.surface2, unit.Dp(5), func(gtx layout.Context) layout.Dimensions {
-			im := widget.Image{Src: imageOp, Fit: widget.Cover, Position: layout.Center}
-			return im.Layout(gtx)
-		})
-	}
-	return a.posterArt(gtx, display, true)
-}
-
-func (a *App) previewGallery(gtx layout.Context, item model.Application) layout.Dimensions {
-	count := len(item.Screenshots)
-	source := "APP PREVIEW"
-	if info, ok := a.metadataFor(item.ID); ok && len(info.Screenshots) > 0 {
-		count = len(info.Screenshots)
-		source = "PREVIEW  ·  FLATHUB APPSTREAM"
-	}
-	if count == 0 {
-		return layout.Dimensions{}
-	}
-	if count > 3 {
-		count = 3
-	}
-	return layout.Inset{Top: unit.Dp(16), Bottom: unit.Dp(20)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-			layout.Rigid(label(a.theme, unit.Sp(8), source, colors.dim).Layout),
-			layout.Rigid(layout.Spacer{Height: unit.Dp(8)}.Layout),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				children := make([]layout.FlexChild, 0, count)
-				for index := 0; index < count; index++ {
-					i := index
-					children = append(children, layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-						right := unit.Dp(0)
-						if i < count-1 {
-							right = unit.Dp(8)
-						}
-						return layout.Inset{Right: right}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-							gtx.Constraints.Min.Y = gtx.Dp(unit.Dp(172))
-							gtx.Constraints.Max.Y = gtx.Constraints.Min.Y
-							return widget.Border{Color: colors.line, CornerRadius: unit.Dp(6), Width: unit.Dp(1)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-								return roundedBackground(gtx, colors.surface2, unit.Dp(6), func(gtx layout.Context) layout.Dimensions {
-									if imageOp, loaded := a.screenshot(item.ID, i); loaded {
-										im := widget.Image{Src: imageOp, Fit: widget.Cover, Position: layout.Center}
-										return im.Layout(gtx)
-									}
-									return layout.Center.Layout(gtx, label(a.theme, unit.Sp(9), "LOADING PREVIEW…", colors.dim).Layout)
-								})
-							})
-						})
-					}))
-				}
-				return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, children...)
-			}),
-		)
-	})
-}
-
-func (a *App) monogram(gtx layout.Context, name string, size unit.Dp) layout.Dimensions {
-	gtx.Constraints.Min = image.Pt(gtx.Dp(size), gtx.Dp(size))
-	gtx.Constraints.Max = gtx.Constraints.Min
-	return roundedBackground(gtx, colors.surface2, unit.Dp(6), func(gtx layout.Context) layout.Dimensions {
-		l := displayLabel(a.theme, unit.Sp(float32(size)*0.31), initials(name), colors.bright)
-		l.Alignment = text.Middle
-		return l.Layout(gtx)
 	})
 }
 
@@ -1067,6 +774,7 @@ func (a *App) appInstalled(appID string) bool {
 
 func (a *App) openDetail(item model.Application) {
 	a.selectedID = item.ID
+	a.galleryIndex = 0
 	a.variantSelection[item.ID] = a.preferredVariant(item)
 	a.pending = nil
 	a.detailList.Position = layout.Position{}
@@ -1078,13 +786,13 @@ func (a *App) footer(gtx layout.Context) layout.Dimensions {
 	status := ""
 	statusColor := colors.dim
 	if a.catalogLoading {
-		status = "SYNCING CATALOGUE"
+		status = "Syncing catalogue"
 		statusColor = colors.subtle
 	} else if a.scanBusy {
-		status = "SCANNING"
+		status = "Checking installed applications"
 		statusColor = colors.subtle
 	} else if a.busy {
-		status = "WORKING"
+		status = "Working"
 		statusColor = colors.subtle
 	} else if a.statusBad && a.status != "" {
 		status = a.status
@@ -1094,176 +802,37 @@ func (a *App) footer(gtx layout.Context) layout.Dimensions {
 		return layout.Dimensions{}
 	}
 	return layout.Inset{Top: unit.Dp(8), Bottom: unit.Dp(8)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		l := label(a.theme, unit.Sp(8), status, statusColor)
+		l := label(a.theme, unit.Sp(11), status, statusColor)
 		l.MaxLines = 1
 		return l.Layout(gtx)
 	})
 }
 
 func (a *App) detail(gtx layout.Context, item model.Application) layout.Dimensions {
-	a.loadMetadata(item)
-	display := a.enriched(item)
-	variants := item.Variants[a.selected]
-	selected, selectedSet := a.variantSelection[item.ID]
-	if !selectedSet || selected < 0 || selected >= len(variants) {
-		selected = a.defaultVariant(item)
-		a.variantSelection[item.ID] = selected
-	}
-	for i := range variants {
-		key := fmt.Sprintf("%s:%s:%d", item.ID, a.selected, i)
-		if a.providerButtons[key] == nil {
-			a.providerButtons[key] = new(widget.Clickable)
-		}
-	}
-
-	return a.detailList.Layout(gtx, 1, func(gtx layout.Context, _ int) layout.Dimensions {
-		return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				if a.backButton.Clicked(gtx) {
-					a.selectedID = ""
-					a.pending = nil
-				}
-				style := button(a.theme, &a.backButton, "←  BACK", false)
-				style.TextSize = unit.Sp(9)
-				style.Inset = layout.Inset{Top: unit.Dp(7), Bottom: unit.Dp(7), Left: unit.Dp(10), Right: unit.Dp(10)}
-				return layout.Inset{Bottom: unit.Dp(12)}.Layout(gtx, style.Layout)
-			}),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				gtx.Constraints.Min.Y = gtx.Dp(unit.Dp(216))
-				gtx.Constraints.Max.Y = gtx.Constraints.Min.Y
-				return widget.Border{Color: colors.line, CornerRadius: unit.Dp(6), Width: unit.Dp(1)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					return roundedBackground(gtx, colors.surface, unit.Dp(6), func(gtx layout.Context) layout.Dimensions {
-						return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
-							layout.Flexed(0.38, func(gtx layout.Context) layout.Dimensions {
-								return a.posterArt(gtx, display, true)
-							}),
-							layout.Flexed(0.62, func(gtx layout.Context) layout.Dimensions {
-								return layout.Inset{Top: unit.Dp(24), Bottom: unit.Dp(22), Left: unit.Dp(24), Right: unit.Dp(24)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-									return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-										layout.Rigid(label(a.theme, unit.Sp(8), strings.ToUpper(firstCategory(display)), colors.dim).Layout),
-										layout.Rigid(layout.Spacer{Height: unit.Dp(8)}.Layout),
-										layout.Rigid(displayLabel(a.theme, unit.Sp(28), display.Name, colors.bright).Layout),
-										layout.Rigid(layout.Spacer{Height: unit.Dp(6)}.Layout),
-										layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-											l := label(a.theme, unit.Sp(12), display.Summary, colors.subtle)
-											l.MaxLines = 2
-											return l.Layout(gtx)
-										}),
-										layout.Flexed(1, func(gtx layout.Context) layout.Dimensions { return layout.Dimensions{Size: gtx.Constraints.Min} }),
-										layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-											meta := strings.TrimSpace(display.Developer)
-											if meta == "" {
-												meta = a.providerName(item)
-											}
-											if info, ok := a.metadataFor(item.ID); ok && len(info.Releases) > 0 && info.Releases[0].Version != "" {
-												meta += "  ·  " + info.Releases[0].Version
-											}
-											return label(a.theme, unit.Sp(8), strings.ToUpper(meta), colors.dim).Layout(gtx)
-										}),
-									)
-								})
-							}),
-						)
-					})
-				})
-			}),
-			layout.Rigid(layout.Spacer{Height: unit.Dp(14)}.Layout),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				return boxed(gtx, colors.surface, colors.line, unit.Dp(16), func(gtx layout.Context) layout.Dimensions {
-					l := label(a.theme, unit.Sp(12), display.Description, colors.cream)
-					l.MaxLines = 14
-					return l.Layout(gtx)
-				})
-			}),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				return a.previewGallery(gtx, item)
-			}),
-			layout.Rigid(label(a.theme, unit.Sp(8), "INSTALLATION SOURCE", colors.dim).Layout),
-			layout.Rigid(layout.Spacer{Height: unit.Dp(8)}.Layout),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				children := make([]layout.FlexChild, 0, len(variants))
-				for i := range variants {
-					idx := i
-					children = append(children, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-						return layout.Inset{Bottom: unit.Dp(7)}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-							return a.providerRow(gtx, item, idx, selected == idx)
-						})
-					}))
-				}
-				return layout.Flex{Axis: layout.Vertical}.Layout(gtx, children...)
-			}),
-			layout.Rigid(layout.Spacer{Height: unit.Dp(14)}.Layout),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions { return a.actionArea(gtx, item, selected) }),
-			layout.Rigid(layout.Spacer{Height: unit.Dp(14)}.Layout),
-			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				if a.pending == nil || a.pending.AppID != item.ID {
-					return layout.Dimensions{}
-				}
-				return a.planPanel(gtx, *a.pending)
-			}),
-		)
-	})
-}
-
-func (a *App) providerRow(gtx layout.Context, item model.Application, index int, active bool) layout.Dimensions {
-	variant := item.Variants[a.selected][index]
-	key := fmt.Sprintf("%s:%s:%d", item.ID, a.selected, index)
-	click := a.providerButtons[key]
-	if click.Clicked(gtx) && !a.busy {
-		a.variantSelection[item.ID] = index
-		a.pending = nil
-	}
-	border := colors.line
-	bg := colors.surface2
-	if active {
-		border = colors.strong
-		bg = colors.raised
-	}
-	return click.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		return boxed(gtx, bg, border, unit.Dp(14), func(gtx layout.Context) layout.Dimensions {
-			return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
-				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-					mark := "○"
-					c := colors.dim
-					if active {
-						mark, c = "●", colors.accent
-					}
-					return label(a.theme, unit.Sp(12), mark, c).Layout(gtx)
-				}),
-				layout.Rigid(layout.Spacer{Width: unit.Dp(12)}.Layout),
-				layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-					name := variantName(variant)
-					detail := variant.Package
-					return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-						layout.Rigid(label(a.theme, unit.Sp(14), name, colors.bright).Layout),
-						layout.Rigid(layout.Spacer{Height: unit.Dp(3)}.Layout),
-						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-							l := label(a.theme, unit.Sp(10), detail, colors.dim)
-							l.MaxLines = 1
-							return l.Layout(gtx)
-						}),
-					)
-				}),
-			)
-		})
-	})
+	return a.applicationDetail(gtx, item)
 }
 
 func (a *App) actionArea(gtx layout.Context, item model.Application, selected int) layout.Dimensions {
 	if selected < 0 || selected >= len(item.Variants[a.selected]) {
-		return a.empty(gtx, "NO INSTALL SOURCE", "Available elsewhere as "+scopeSummary(item)+", but no provider matches "+a.host.Distro.DisplayName()+" on this machine.")
+		if item.Ecosystem != nil && !item.Supports(a.selected) {
+			return a.empty(gtx, strings.ToUpper(item.Ecosystem.Status), item.Ecosystem.Reason)
+		}
+		return a.empty(gtx, "NO INSTALL SOURCE", "No compatible installation source is available on this machine.")
 	}
 	if a.busy {
 		return a.compactActionButton(gtx, "WORKING…", false)
+	}
+	variant := item.Variants[a.selected][selected]
+	if variant.Kind == model.ProviderNixConfig && a.host.Distro == model.DistroNixOS {
+		if a.actionButton.Clicked(gtx) {
+			a.showConfig = !a.showConfig
+		}
+		return button(a.theme, &a.actionButton, "View configuration", true).Layout(gtx)
 	}
 	if a.isChecking(item.ID) {
 		return a.compactActionButton(gtx, "CHECKING INSTALLATION…", false)
 	}
 
-	variant := item.Variants[a.selected][selected]
-	if variant.Kind == model.ProviderNixConfig && a.host.Distro == model.DistroNixOS {
-		return a.nixConfigGuide(gtx, variant)
-	}
 	if !a.service.VariantAvailable(a.selected, variant) {
 		title := "NOT AVAILABLE ON THIS HOST"
 		message := "Choose another installation source for this system."
@@ -1314,6 +883,9 @@ func (a *App) nixConfigGuide(gtx layout.Context, variant model.Variant) layout.D
 		pkg = "package-name"
 	}
 	snippet := "environment.systemPackages = with pkgs; [\n  " + pkg + "\n];"
+	if variant.FlakeRef != "" {
+		snippet = "environment.systemPackages = [\n  (builtins.getFlake " + strconv.Quote(variant.FlakeRef) + ").packages.${pkgs.stdenv.hostPlatform.system}." + pkg + "\n];"
+	}
 	return boxed(gtx, colors.surface2, colors.line, unit.Dp(14), func(gtx layout.Context) layout.Dimensions {
 		return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 			layout.Rigid(mediumLabel(a.theme, unit.Sp(10), "ADD TO YOUR NIXOS CONFIG", colors.bright).Layout),
@@ -1372,12 +944,19 @@ func (a *App) defaultVariant(item model.Application) int {
 			}
 		}
 	}
+	if a.state != nil && a.state.Data.PreferredProvider != "" {
+		for i, variant := range variants {
+			if variant.Kind == a.state.Data.PreferredProvider && a.methodAvailable(variant) {
+				return i
+			}
+		}
+	}
 	recommended := item.RecommendedVariant(a.selected)
-	if recommended >= 0 && recommended < len(variants) && a.service.VariantAvailable(a.selected, variants[recommended]) {
+	if recommended >= 0 && recommended < len(variants) && a.methodAvailable(variants[recommended]) {
 		return recommended
 	}
 	for i, variant := range variants {
-		if a.service.VariantAvailable(a.selected, variant) {
+		if a.methodAvailable(variant) {
 			return i
 		}
 	}
@@ -1390,17 +969,21 @@ func (a *App) planPanel(gtx layout.Context, plan provider.Plan) layout.Dimension
 			layout.Rigid(label(a.theme, unit.Sp(10), "CONFIRM TRANSACTION", colors.bright).Layout),
 			layout.Rigid(layout.Spacer{Height: unit.Dp(8)}.Layout),
 			layout.Rigid(label(a.theme, unit.Sp(17), plan.Summary(), colors.bright).Layout),
+			layout.Rigid(layout.Spacer{Height: unit.Dp(8)}.Layout),
+			layout.Rigid(label(a.theme, unit.Sp(13), preferredFallbackText(a.state.Data.PreferredProvider, plan.Variant.Kind), colors.subtle).Layout),
 			layout.Rigid(layout.Spacer{Height: unit.Dp(12)}.Layout),
 		}
-		for _, step := range plan.Steps {
-			step := step
-			children = append(children, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-				prefix := "• "
-				if step.Elevated {
-					prefix = "◆ "
-				}
-				return layout.Inset{Bottom: unit.Dp(5)}.Layout(gtx, label(a.theme, unit.Sp(11), prefix+step.Title, colors.subtle).Layout)
-			}))
+		if a.advanced.Value {
+			for _, step := range plan.Steps {
+				step := step
+				children = append(children, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+					prefix := "• "
+					if step.Elevated {
+						prefix = "◆ "
+					}
+					return layout.Inset{Bottom: unit.Dp(5)}.Layout(gtx, label(a.theme, unit.Sp(11), prefix+step.Title, colors.subtle).Layout)
+				}))
+			}
 		}
 		for _, warning := range plan.Warnings {
 			warning := warning
@@ -1429,25 +1012,9 @@ func (a *App) planPanel(gtx layout.Context, plan provider.Plan) layout.Dimension
 	})
 }
 
-func (a *App) installedView(gtx layout.Context) layout.Dimensions {
-	if a.scanBusy && len(a.installed) == 0 {
-		return a.empty(gtx, "SCANNING", "Checking native repositories, Flatpak, portable apps and Nix providers.")
-	}
-	if len(a.installed) == 0 {
-		return a.empty(gtx, "NOTHING DETECTED", "Refresh to scan Ryomarket's catalogue against this system.")
-	}
-	return a.appGrid(gtx, a.installedApps)
-}
+func (a *App) installedView(gtx layout.Context) layout.Dimensions { return a.management(gtx, false) }
 
-func (a *App) updatesView(gtx layout.Context) layout.Dimensions {
-	if a.scanBusy {
-		return a.empty(gtx, "CHECKING PROVIDERS", "Looking for updates without modifying package databases.")
-	}
-	if len(a.updates) == 0 {
-		return a.empty(gtx, "UP TO DATE", "No provider reported an application update.")
-	}
-	return a.appGrid(gtx, a.updateApps)
-}
+func (a *App) updatesView(gtx layout.Context) layout.Dimensions { return a.management(gtx, true) }
 
 func (a *App) empty(gtx layout.Context, title, body string) layout.Dimensions {
 	return layout.Center.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
@@ -1504,6 +1071,9 @@ func (a *App) execute(plan provider.Plan) {
 		return
 	}
 	a.busy = true
+	a.transactionApp = plan.AppID
+	a.failedPlan = nil
+	a.transactionOutput = ""
 	a.status = plan.Summary()
 	a.statusBad = false
 	go func() {
@@ -1594,7 +1164,11 @@ func (a *App) startCatalogRefresh() {
 }
 
 func (a *App) startScan(checkUpdates bool) {
-	if a.scanBusy || a.host.Distro == model.DistroUnknown {
+	if a.host.Distro == model.DistroUnknown {
+		return
+	}
+	if a.scanBusy {
+		a.scanUpdatesRequested = a.scanUpdatesRequested || checkUpdates
 		return
 	}
 	a.scanBusy = true
@@ -1640,7 +1214,14 @@ func (a *App) loadMetadata(item model.Application) {
 			a.metadataCh <- metadataResult{appID: appID, err: ctx.Err()}
 			return
 		}
-		data, err := (metadata.FlathubClient{}).App(ctx, flatpakID)
+		data, cached := metadata.LoadAppCache(flatpakID)
+		var err error
+		if !cached {
+			data, err = (metadata.FlathubClient{}).App(ctx, flatpakID)
+			if err == nil {
+				_ = metadata.SaveAppCache(flatpakID, data)
+			}
+		}
 		a.metadataCh <- metadataResult{appID: appID, data: data, err: err}
 		a.win.Invalidate()
 	}(item.ID, packageID)

@@ -19,6 +19,7 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"github.com/Ryoku-dev/ryomarket/internal/state"
 )
 
 type palette struct {
@@ -46,27 +47,7 @@ type palette struct {
 var colors = loadPalette()
 
 func loadPalette() palette {
-	p := palette{
-		bg:        hex(0x000000),
-		rail:      hex(0x08090b),
-		surface:   hex(0x0a0a0a),
-		surface2:  hex(0x111216),
-		raised:    hex(0x17191f),
-		line:      color.NRGBA{R: 205, G: 196, B: 186, A: 34},
-		strong:    color.NRGBA{R: 205, G: 196, B: 186, A: 88},
-		bright:    hex(0xcdc4ba),
-		cream:     hex(0xb0a9a0),
-		subtle:    hex(0x958f87),
-		dim:       hex(0x7a756e),
-		faint:     color.NRGBA{R: 122, G: 117, B: 110, A: 180},
-		bone:      hex(0xcdc4ba),
-		inkOnBone: hex(0x000000),
-		accent:    hex(0xe2342a),
-		accentInk: hex(0x000000),
-		gold:      hex(0xd9a441),
-		ok:        hex(0x7fbf6a),
-		bad:       hex(0xe05a5a),
-	}
+	p := neutralPalette(false)
 
 	wallPath, shellPath, themePath := themePaths()
 	wall := readObject(wallPath)
@@ -95,6 +76,10 @@ func loadPalette() palette {
 	}
 
 	p.bg = pick("surface", p.bg)
+	if relativeLuminance(p.bg) > 0.45 {
+		p = neutralPalette(true)
+		p.bg = pick("surface", p.bg)
+	}
 	p.rail = pick("surfaceContainerLowest", p.rail)
 	p.surface = pick("surface", p.surface)
 	p.surface2 = pick("surfaceContainerLow", p.surface2)
@@ -107,7 +92,7 @@ func loadPalette() palette {
 	p.bone = pick("inverseSurface", p.bone)
 	p.inkOnBone = pick("inverseOnSurface", p.inkOnBone)
 	p.accent = pick("primary", p.accent)
-	p.accentInk = pick("onPrimary", p.accentInk)
+	p.accentInk = pick("onPrimary", contrastInk(p.accent))
 	p.line = withAlpha(p.bright, 34)
 	p.strong = withAlpha(p.bright, 86)
 	return p
@@ -242,6 +227,7 @@ func parseHex(value string) (color.NRGBA, bool) {
 
 func newTheme() *material.Theme {
 	th := material.NewTheme()
+	th.Shaper = appShaper
 	th.Palette.Bg = colors.bg
 	th.Palette.Fg = colors.bright
 	th.Palette.ContrastBg = colors.bone
@@ -261,7 +247,7 @@ func withAlpha(c color.NRGBA, alpha uint8) color.NRGBA {
 }
 
 func selectedInk() color.NRGBA {
-	return hex(0x000000)
+	return contrastInk(colors.bone)
 }
 
 func contrastInk(bg color.NRGBA) color.NRGBA {
@@ -328,7 +314,8 @@ func mediumLabel(th *material.Theme, size unit.Sp, text string, c color.NRGBA) m
 
 func displayLabel(th *material.Theme, size unit.Sp, text string, c color.NRGBA) material.LabelStyle {
 	style := label(th, size, text, c)
-	style.Font.Typeface = font.Typeface("Fraunces")
+	style.Font.Typeface = font.Typeface("Space Grotesk")
+	style.Font.Weight = font.Medium
 	return style
 }
 
@@ -341,15 +328,93 @@ func jpLabel(th *material.Theme, size unit.Sp, text string, c color.NRGBA) mater
 func button(th *material.Theme, click *widget.Clickable, text string, primary bool) material.ButtonStyle {
 	style := material.Button(th, click, text)
 	style.CornerRadius = unit.Dp(6)
-	style.TextSize = unit.Sp(12)
+	style.TextSize = unit.Sp(13)
 	style.Inset = layout.Inset{Top: unit.Dp(9), Bottom: unit.Dp(9), Left: unit.Dp(15), Right: unit.Dp(15)}
 	if primary {
-		style.Background = colors.bone
-		style.Color = hex(0x000000)
+		style.Background = colors.accent
+		style.Color = colors.accentInk
 		style.Font.Weight = font.SemiBold
 	} else {
 		style.Background = colors.surface2
 		style.Color = colors.cream
 	}
 	return style
+}
+
+func blendColor(a, b color.NRGBA, t float64) color.NRGBA {
+	mix := func(x, y uint8) uint8 { return uint8(float64(x)*(1-t) + float64(y)*t) }
+	return color.NRGBA{R: mix(a.R, b.R), G: mix(a.G, b.G), B: mix(a.B, b.B), A: 255}
+}
+
+func neutralPalette(light bool) palette {
+	p := palette{bg: hex(0x121315), rail: hex(0x0c0d0f), surface: hex(0x181a1d), surface2: hex(0x1d1f23), raised: hex(0x26292e), bright: hex(0xe9e6df), subtle: hex(0xb6b7b7), accent: hex(0xcebea6), gold: hex(0xc6a971), ok: hex(0x8caf96), bad: hex(0xe7867f)}
+	if light {
+		p.bg = hex(0xf7f6f2)
+		p.rail = hex(0xefeee8)
+		p.surface = hex(0xffffff)
+		p.surface2 = hex(0xecebe5)
+		p.raised = hex(0xe3e2db)
+		p.bright = hex(0x24272a)
+		p.subtle = hex(0x565e65)
+		p.accent = hex(0x725c42)
+		p.gold = hex(0x806017)
+		p.ok = hex(0x396346)
+		p.bad = hex(0xb32e32)
+	}
+	return finishPalette(p)
+}
+
+func finishPalette(p palette) palette {
+	if contrastRatio(p.bright, p.bg) < 4.5 {
+		p.bright = contrastInk(p.bg)
+	}
+	if contrastRatio(p.subtle, p.bg) < 4.5 {
+		p.subtle = p.bright
+	}
+	if min(contrastRatio(p.accent, p.bg), contrastRatio(p.accent, p.surface2), contrastRatio(p.accent, p.rail)) < 5.5 {
+		original := p.accent
+		ink := contrastInk(p.bg)
+		for i := 1; i <= 20; i++ {
+			p.accent = blendColor(original, ink, float64(i)/20)
+			if min(contrastRatio(p.accent, p.bg), contrastRatio(p.accent, p.surface2), contrastRatio(p.accent, p.rail)) >= 5.5 {
+				break
+			}
+		}
+	}
+	p.cream = p.bright
+	p.dim = p.subtle
+	p.faint = withAlpha(p.subtle, 190)
+	p.line = withAlpha(p.bright, 26)
+	p.strong = withAlpha(p.bright, 70)
+	p.bone = p.bright
+	p.inkOnBone = contrastInk(p.bone)
+	p.accentInk = contrastInk(p.accent)
+	return p
+}
+
+func applyAppearance(p palette, pref state.Appearance) palette {
+	inheritedAccent := p.accent
+	switch pref.Mode {
+	case "dark":
+		p = neutralPalette(false)
+		p.accent = inheritedAccent
+	case "light":
+		p = neutralPalette(true)
+		p.accent = inheritedAccent
+	}
+	if c, ok := parseHex(pref.Surface); ok {
+		p.bg = c
+		light := relativeLuminance(c) > 0.45
+		base := neutralPalette(light)
+		p.surface = blendColor(c, base.bright, 0.025)
+		p.surface2 = blendColor(c, base.bright, 0.055)
+		p.raised = blendColor(c, base.bright, 0.09)
+		p.rail = blendColor(c, base.bg, 0.20)
+		p.bright = base.bright
+		p.subtle = base.subtle
+	}
+	if c, ok := parseHex(pref.Accent); ok {
+		p.accent = c
+	}
+	return finishPalette(p)
 }

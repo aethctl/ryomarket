@@ -253,7 +253,7 @@ func NixProfile() Backend {
 	return commandBackend{
 		kind: model.ProviderNixProfile, binary: "nix",
 		install: func(v model.Variant) Step {
-			return Step{"Add " + v.Package + " to Nix profile", "nix", nixArgs("profile", "add", "nixpkgs#"+v.Package), false}
+			return Step{"Add " + v.Package + " to Nix profile", "nix", nixArgs("profile", "add", nixInstallable(v)), false}
 		},
 		remove: func(v model.Variant) Step {
 			selector := nixProfileSelector(v)
@@ -268,6 +268,13 @@ func NixProfile() Backend {
 			return err == nil && nixProfileContains(out, nixProfileSelector(v))
 		},
 	}
+}
+
+func nixInstallable(v model.Variant) string {
+	if v.FlakeRef != "" {
+		return v.FlakeRef + "#" + v.Package
+	}
+	return "nixpkgs#" + v.Package
 }
 
 func nixProfileSelector(v model.Variant) string {
@@ -451,7 +458,7 @@ func AppImage() Backend { return portableBackend{kind: model.ProviderAppImage} }
 func Upstream() Backend { return portableBackend{kind: model.ProviderUpstream} }
 
 func Registry() map[model.ProviderKind]Backend {
-	backends := []Backend{DNF(), Pacman(), XBPS(), NixProfile(), NixConfig(), Flatpak(), AppImage(), Upstream()}
+	backends := []Backend{DNF(), Pacman(), XBPS(), NixFlake(), NixProfile(), NixConfig(), Flatpak(), AppImage(), Upstream()}
 	out := make(map[model.ProviderKind]Backend, len(backends))
 	for _, backend := range backends {
 		out[backend.Kind()] = backend

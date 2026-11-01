@@ -23,8 +23,18 @@ type Transaction struct {
 	Error     string             `json:"error,omitempty"`
 }
 
+type Appearance struct {
+	Mode          string `json:"mode,omitempty"`
+	Accent        string `json:"accent,omitempty"`
+	Surface       string `json:"surface,omitempty"`
+	ReducedMotion bool   `json:"reduced_motion,omitempty"`
+}
+
 type Data struct {
-	Transactions []Transaction `json:"transactions,omitempty"`
+	WelcomeDone       bool               `json:"welcome_done,omitempty"`
+	Appearance        Appearance         `json:"appearance,omitempty"`
+	PreferredProvider model.ProviderKind `json:"preferred_provider,omitempty"`
+	Transactions      []Transaction      `json:"transactions,omitempty"`
 }
 
 type Store struct {
